@@ -59,8 +59,8 @@ services:
       WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
       WORDPRESS_TABLE_PREFIX: wp_
       WORDPRESS_CONFIG_EXTRA: |
-        define('WP_HOME', 'https://upravdom.ustroy.art');
-        define('WP_SITEURL', 'https://upravdom.ustroy.art');
+        define('WP_HOME', 'https://panel.ustroy.webtm.ru');
+        define('WP_SITEURL', 'https://panel.ustroy.webtm.ru');
     env_file: .env
     depends_on:
       - db
@@ -83,7 +83,7 @@ services:
       --email i.tarchevsky@yandex.ru \
       --agree-tos \
       --no-eff-email \
-      -d ustroy.art -d upravdom.ustroy.art"
+      -d ustroy.webtm.ru -d panel.ustroy.webtm.ru"
     networks:
       - web
     depends_on:
