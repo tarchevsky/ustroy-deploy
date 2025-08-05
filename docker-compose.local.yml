@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  nextjs:
+    build: .
+    env_file: .env
+    restart: always
+    networks:
+      - web
+    ports:
+      - '3000:3000'
+
+  nginx:
+    image: nginx:1.25-alpine
+    volumes:
+      - ./nginx.local.conf:/etc/nginx/nginx.conf:ro
+      - ./public:/usr/share/nginx/html:ro
+    depends_on:
+      - nextjs
+    ports:
+      - '8080:80'
+    networks:
+      - web
+
+networks:
+  web:
