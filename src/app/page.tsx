@@ -20,7 +20,7 @@ import {
 export const revalidate = 5
 
 // ID константы
-const PAGE_ID = 'cG9zdDoxNQ==' // Текущий ID
+const PAGE_ID = 'cG9zdDo0MTU=' // Текущий ID
 const ALTERNATIVE_PAGE_ID = 'cG9zdDo5' // Альтернативный ID для проверки
 const HOME_PAGE_PATH = 'home' // Slug главной страницы для проверки
 const CATEGORY_ID = 'dGVybToz'
