@@ -133,6 +133,67 @@ server {
 }
 ```
 
+На всякий случай (важно) закомментированная версия:
+
+```nginx
+# server {
+    #     listen 443 ssl;
+    #     server_name panel.ustroy.webtm.ru;
+    #
+    #     ssl_certificate /etc/letsencrypt/live/ustroy.webtm.ru/fullchain.pem;
+    #     ssl_certificate_key /etc/letsencrypt/live/ustroy.webtm.ru/privkey.pem;
+    #     ssl_protocols TLSv1.2 TLSv1.3;
+    #     ssl_ciphers HIGH:!aNULL:!MD5;
+    #
+    #     client_max_body_size 64m;
+    #
+    #     root /var/www/html;
+    #     index index.php;
+    #
+    #     # Редирект с главной страницы на /wp-admin
+    #     location = / {
+    #         return 302 /wp-admin;
+    #     }
+    #
+    #     location / {
+    #         try_files $uri $uri/ /index.php?$args;
+    #     }
+    #
+    #     location ~ \..*\.php$ {
+    #         fastcgi_pass wordpress:9000;
+    #         fastcgi_index index.php;
+    #         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    #         fastcgi_param HTTPS on;
+    #         fastcgi_param HTTP_X_FORWARDED_PROTO https;
+    #         include fastcgi_params;
+    #     }
+    #
+    #     location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
+    #         expires max;
+    #         log_not_found off;
+    #     }
+    # }
+
+    # server {
+    #     listen 443 ssl;
+    #     server_name ustroy.webtm.ru;
+    #
+    #     ssl_certificate /etc/letsencrypt/live/ustroy.webtm.ru/fullchain.pem;
+    #     ssl_certificate_key /etc/letsencrypt/live/ustroy.webtm.ru/privkey.pem;
+    #     ssl_protocols TLSv1.2 TLSv1.3;
+    #     ssl_ciphers HIGH:!aNULL:!MD5;
+    #
+    #     location / {
+    #         proxy_pass http://nextjs:3000;
+    #         proxy_http_version 1.1;
+    #         proxy_set_header Upgrade $http_upgrade;
+    #         proxy_set_header Connection 'upgrade';
+    #         proxy_set_header Host $host;
+    #         proxy_cache_bypass $http_upgrade;
+    #     }
+    # }
+```
+
 2. Перезапустите nginx с новой конфигурацией:
 
 ```bash
