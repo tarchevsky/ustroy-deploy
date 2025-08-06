@@ -46,18 +46,18 @@ WORDPRESS_TITLE=Ustroy
 
 ### 2. Первичный запуск инфраструктуры
 
-Для получения SSL-сертификатов необходимо сначала запустить Nginx. Ранее nginx зависел от nextjs, но эта зависимость была убрана для корректного пошагового развертывания:
+Для получения SSL-сертификатов необходимо сначала запустить Nginx с упрощенной конфигурацией, которая обслуживает только пути для проверки доменов на порту 80:
 
 ```bash
 # Запуск необходимых сервисов для получения сертификатов
-docker compose up -d nginx certbot-init
+docker compose up -d nginx
 ```
 
-> **ВАЖНО**: Теперь nginx запускается без автоматического запуска nextjs, что позволяет получить SSL-сертификаты до настройки WordPress.
+> **ВАЖНО**: Nginx запускается с упрощенной конфигурацией, которая не требует наличия других сервисов (wordpress, nextjs) для обслуживания путей проверки доменов.
 
 ### 3. Получение SSL-сертификатов
 
-После запуска контейнеров выполните команду для получения сертификатов:
+После запуска контейнера nginx выполните команду для получения сертификатов:
 
 ```bash
 # Инициализация сертификатов
@@ -66,22 +66,91 @@ docker compose run --rm certbot-init
 
 Эта команда запустит одноразовый контейнер certbot-init, который получит SSL-сертификаты для обоих доменов. Если команда выполнится успешно, сертификаты будут сохранены в volume `certbot-etc` и будут доступны для nginx.
 
-### 4. Запуск инфраструктуры WordPress
+> **ВАЖНО**: После успешного получения сертификатов необходимо будет восстановить полную конфигурацию nginx для работы с WordPress и Next.js.
 
-После получения сертификатов можно запустить сервисы, необходимые для работы WordPress:
+### 4. Восстановление полной конфигурации nginx
+
+После успешного получения SSL-сертификатов необходимо восстановить полную конфигурацию nginx для работы с WordPress и Next.js:
+
+1. Верните полную конфигурацию nginx, раскомментировав серверы на порту 443 в файле `nginx.conf`:
+
+```nginx
+server {
+    listen 443 ssl;
+    server_name panel.ustroy.webtm.ru;
+
+    ssl_certificate /etc/letsencrypt/live/ustroy.webtm.ru/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/ustroy.webtm.ru/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+
+    client_max_body_size 64m;
+
+    root /var/www/html;
+    index index.php;
+
+    # Редирект с главной страницы на /wp-admin
+    location = / {
+        return 302 /wp-admin;
+    }
+
+    location / {
+        try_files $uri $uri/ /index.php?$args;
+    }
+
+    location ~ \..*\.php$ {
+        fastcgi_pass wordpress:9000;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param HTTPS on;
+        fastcgi_param HTTP_X_FORWARDED_PROTO https;
+        include fastcgi_params;
+    }
+
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
+        expires max;
+        log_not_found off;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name ustroy.webtm.ru;
+
+    ssl_certificate /etc/letsencrypt/live/ustroy.webtm.ru/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/ustroy.webtm.ru/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+
+    location / {
+        proxy_pass http://nextjs:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
+
+2. Перезапустите nginx с новой конфигурацией:
 
 ```bash
-# Остановка предыдущих контейнеров (если были запущены)
-docker compose down
+# Перезапуск nginx с полной конфигурацией
+docker compose restart nginx
+```
 
-# Запуск сервисов WordPress
-docker compose up -d nginx certbot db wordpress
+### 5. Запуск инфраструктуры WordPress
+
+После восстановления конфигурации nginx можно запустить сервисы, необходимые для работы WordPress:
+
+```bash
+# Запуск сервисов WordPress (если они еще не запущены)
+docker compose up -d db wordpress
 ```
 
 Эта команда запустит следующие сервисы:
 
-- nginx - веб-сервер с SSL-терминацией
-- certbot - сервис для автоматического обновления SSL-сертификатов
 - db - база данных MariaDB для WordPress
 - wordpress - контейнер с WordPress
 
