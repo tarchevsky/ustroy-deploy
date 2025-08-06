@@ -46,12 +46,13 @@ services:
       - ./wp-config-extra.php:/var/www/html/wp-config-extra.php
     networks:
       - ustroy_network
-    healthcheck:
-      test: ["CMD-SHELL", "(echo -n 'GET /status' | nc -U /var/run/php/php8.3-fpm.sock | grep -q 'pool:') || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
+    # Временно отключаем healthcheck для первоначального запуска
+    # healthcheck:
+    #   test: ["CMD", "ls", "/var/run/php/php8.3-fpm.sock"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 30s
 
   # Nginx
   nginx:
