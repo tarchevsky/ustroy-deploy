@@ -3,11 +3,9 @@ import {
   cont_md,
   cont_sm,
   cont_xs,
-  cont_xxl,
   ind_md,
   ind_sm,
   ind_xs,
-  ind_xxl,
 } from './src/constants/theme.constants'
 import { tailwindSafelist } from './src/utils/wpToTailwind'
 
@@ -33,9 +31,6 @@ const config: Config = {
           },
           '@screen md': {
             margin: [ind_md],
-          },
-          '@screen 2xl': {
-            margin: [ind_xxl],
           },
         },
         '.cont': {
