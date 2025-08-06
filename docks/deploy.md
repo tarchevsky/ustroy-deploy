@@ -10,6 +10,17 @@
 4. **MariaDB** - база данных для WordPress
 5. **Certbot** - получение и обновление SSL-сертификатов
 
+## Быстрый шаблон команд для деплоя
+
+```sh
+docker compose --profile acme up -d nginx certbot certbot-init
+docker compose logs -f certbot-init
+docker compose --profile acme down
+
+docker compose --profile full up -d db wordpress nginx certbot
+docker compose --profile full up -d nextjs
+```
+
 ## Подготовка к развертыванию
 
 1. Убедитесь, что у вас установлен Docker и Docker Compose
@@ -247,115 +258,86 @@ docker compose restart nginx
 docker compose up -d db wordpress
 ```
 
-Эта команда запустит следующие сервисы:
+---
 
-- db - база данных MariaDB для WordPress
-- wordpress - контейнер с WordPress
+## Быстрый шаблон команд для деплоя
 
-> **ВАЖНО**: Сервис nextjs (фронтенд) НЕ запускается на этом этапе, так как для его корректной работы необходимо сначала полностью настроить WordPress и убедиться, что GraphQL API работает корректно.
+```sh
+docker compose --profile acme up -d nginx certbot certbot-init
+docker compose logs -f certbot-init
+docker compose --profile acme down
 
-### 5. Настройка WordPress
-
-1. Откройте в браузере `https://panel.ustroy.webtm.ru`
-2. Пройдите стандартную процедуру установки WordPress:
-
-   - Система автоматически использует данные из переменных окружения
-   - Название сайта: "Ustroy"
-   - Учетная запись администратора: логин: Tadmin, пароль: Qwert10-!yuiop, email: i.tarchevsky@yanex.ru
-   - Нажмите "Установить WordPress"
-
-3. После установки войдите в админку WordPress по адресу `https://panel.ustroy.webtm.ru/wp-login.php`
-
-4. **Обязательная ручная настройка WordPress** (до перехода к фронтенду):
-   - Установите и активируйте плагин WPGraphQL:
-     - Перейдите в раздел "Плагины" → "Добавить новый"
-     - Найдите плагин "WPGraphQL"
-     - Установите и активируйте его
-   - Проверьте работу GraphQL API, открыв в браузере `https://panel.ustroy.webtm.ru/graphql` - должна открыться GraphQL IDE
-   - Выполните любые другие необходимые настройки WordPress (темы, дополнительные плагины и т.д.)
-   - Убедитесь, что все необходимые настройки выполнены и WordPress работает корректно
-
-> **ТОЛЬКО ПОСЛЕ ЭТОГО** можно переходить к настройке фронтенда.
-
-### 5. Настройка Next.js приложения
-
-> **ВАЖНО**: Этот шаг можно выполнять только после полной ручной настройки WordPress-админки, описанной в предыдущем разделе.
-
-Next.js приложение автоматически подключится к WordPress GraphQL API по адресу, указанному в переменной окружения `WORDPRESS_GRAPHQL_ENDPOINT`.
-
-Для запуска приложения в продакшене:
-
-```bash
-# Сборка и запуск приложения
-docker compose up -d nextjs
+docker compose --profile full up -d db wordpress nginx certbot
+docker compose --profile full up -d nextjs
 ```
 
-Эта команда соберет и запустит Next.js приложение в режиме продакшена. Приложение будет доступно по адресу `https://ustroy.webtm.ru`.
+---
 
-> **ПОЧЕМУ ТОЛЬКО СЕЙЧАС**: Фронтенд (Next.js) требует работающего GraphQL API для генерации статики блога. Если запустить его до настройки WordPress, он не сможет получить данные и сборка завершится ошибкой.
+## Пошаговая инструкция
 
-## Проверка работоспособности
+1. **Получить SSL-сертификаты:**
+   - Запустите nginx и certbot для получения сертификатов:
+     ```sh
+     docker compose --profile acme up -d nginx certbot certbot-init
+     docker compose logs -f certbot-init
+     docker compose --profile acme down
+     ```
 
-1. Откройте в браузере `https://ustroy.webtm.ru` - должен отображаться Next.js сайт
-2. Откройте в браузере `https://panel.ustroy.webtm.ru` - должна отображаться WordPress панель
-3. Проверьте, что оба сайта используют HTTPS и сертификаты действительны
+2. **Запустить WordPress и базу данных:**
+   - Запустите все сервисы для production:
+     ```sh
+     docker compose --profile full up -d db wordpress nginx certbot
+     ```
 
-## Обновление SSL-сертификатов
+3. **Настроить WordPress через браузер:**
+   - Перейдите в браузере по адресу https://panel.ustroy.webtm.ru
+   - Выполните первичную настройку (пользователь, плагины, GraphQL и т.д.)
+   - **Важно:** Не запускайте nextjs, пока WordPress полностью не инициализирован и не доступен по адресу https://panel.ustroy.webtm.ru/graphql
 
-Certbot настроен на автоматическое обновление сертификатов через cron-задание в контейнере `certbot`. Сертификаты обновляются раз в 7 дней.
+4. **Запустить Next.js:**
+   - После настройки WordPress выполните:
+     ```sh
+     docker compose --profile full up -d nextjs
+     ```
 
-Для ручного обновления сертификатов выполните:
+5. **Проверить работу сервисов:**
+   - https://panel.ustroy.webtm.ru — админка WordPress
+   - https://ustroy.webtm.ru — фронт Next.js
+   - Для диагностики используйте:
+     ```sh
+     docker compose logs -f nginx
+     docker compose logs -f wordpress
+     docker compose logs -f nextjs
+     ```
 
-```bash
-# Принудительное обновление сертификатов
-docker compose exec certbot certbot renew --force-renewal
-```
+---
 
-Автоматическое обновление работает через entrypoint контейнера certbot, который запускает команду `certbot renew --webroot` каждые 7 дней.
+## Важные замечания
+- Конфиги (docker-compose.yml, nginx.conf) универсальны, не требуют ручных правок.
+- Если сервис (wordpress или nextjs) не поднят — nginx отдаёт 503 с заглушкой.
+- Certbot автоматически продлевает сертификаты (контейнер certbot).
+- Все тома и переменные окружения сохраняются между перезапусками.
+- Для пересоздания сертификатов повторите этап 1.
 
-## Резервное копирование
+---
 
-Для создания резервной копии данных WordPress и базы данных:
+## FAQ
 
-```bash
-# Создание резервной копии базы данных
-docker compose exec db mysqldump -u wordpress -p wordpress > backup-$(date +%F).sql
+**Q: Нужно ли что-то комментировать в nginx.conf?**
+A: Нет! Всё уже готово, nginx отдаёт 503 если сервис не поднят.
 
-# Архивирование данных WordPress
-tar -czf wp-content-$(date +%F).tar.gz ./wp_data
-```
+**Q: Можно ли запускать всё одной командой?**
+A: Нет, сначала нужен этап получения SSL, затем основной запуск.
 
-## Возможные проблемы и их решения
+**Q: Как обновить сертификаты?**
+A: Контейнер certbot делает это автоматически в фоне.
 
-### 1. Ошибка получения SSL-сертификата
+**Q: Как пересоздать сервисы?**
+A: Используйте `docker compose --profile full restart <service>`
 
-Если при получении сертификата возникает ошибка, проверьте:
+---
 
-- Правильность DNS-записей для доменов
-- Доступность портов 80 и 443
-- Что веб-сервер запущен и отвечает по порту 80
-
-### 2. WordPress не может подключиться к базе данных
-
-Проверьте правильность переменных окружения в файле `.env`, особенно:
-
-- WORDPRESS_DB_HOST (должен быть db:3306)
-- WORDPRESS_DB_NAME
-- WORDPRESS_DB_USER
-- WORDPRESS_DB_PASSWORD
-
-### 3. Next.js не может получить данные из WordPress GraphQL
-
-Проверьте:
-
-- Что WordPress и WPGraphQL плагин работают
-- Что переменная WORDPRESS_GRAPHQL_ENDPOINT указывает на правильный адрес
-- Что домен panel.ustroy.webtm.ru доступен из контейнера nextjs
-
-## Дополнительные рекомендации
-
-1. Регулярно обновляйте Docker-образы:
-
+**Если порядок нарушен — nginx/nextjs/wordpress могут отдавать 503. Просто следуйте шагам!**
    ```bash
    docker compose pull
    docker compose up -d

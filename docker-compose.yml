@@ -1,23 +1,13 @@
 services:
-  nextjs:
-    build: .
-    env_file: .env
-    restart: always
-    networks:
-      - web
-    expose:
-      - 3000
-
   nginx:
     image: nginx:1.25-alpine
+    profiles: ["acme", "full"]
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - certbot-etc:/etc/letsencrypt
       - certbot-var:/var/lib/letsencrypt
       - ./public:/usr/share/nginx/html:ro
       - wp_data:/var/www/html:ro
-    # depends_on:
-    #   - nextjs
     ports:
       - '80:80'
       - '443:443'
@@ -26,6 +16,7 @@ services:
 
   certbot:
     image: certbot/certbot
+    profiles: ["acme", "full"]
     volumes:
       - certbot-etc:/etc/letsencrypt
       - certbot-var:/var/lib/letsencrypt
@@ -34,8 +25,27 @@ services:
     networks:
       - web
 
+  certbot-init:
+    image: certbot/certbot
+    profiles: ["acme"]
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - ./public:/usr/share/nginx/html
+    entrypoint: >
+      sh -c "certbot certonly --webroot -w /usr/share/nginx/html \
+      --email i.tarchevsky@yandex.ru \
+      --agree-tos \
+      --no-eff-email \
+      -d ustroy.webtm.ru -d panel.ustroy.webtm.ru"
+    networks:
+      - web
+    depends_on:
+      - nginx
+
   db:
     image: mariadb:11
+    profiles: ["full"]
     restart: always
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -51,6 +61,7 @@ services:
 
   wordpress:
     image: wordpress:6.5-fpm-alpine
+    profiles: ["full"]
     restart: always
     environment:
       WORDPRESS_DB_HOST: db:3306
@@ -72,22 +83,24 @@ services:
       - wp_data:/var/www/html
       - ./docker/php-custom.ini:/usr/local/etc/php/conf.d/99-custom.ini:ro
 
-  certbot-init:
-    image: certbot/certbot
-    volumes:
-      - certbot-etc:/etc/letsencrypt
-      - certbot-var:/var/lib/letsencrypt
-      - ./public:/usr/share/nginx/html
-    entrypoint: >
-      sh -c "certbot certonly --webroot -w /usr/share/nginx/html \
-      --email i.tarchevsky@yandex.ru \
-      --agree-tos \
-      --no-eff-email \
-      -d ustroy.webtm.ru -d panel.ustroy.webtm.ru"
+  nextjs:
+    build: .
+    profiles: ["full"]
+    env_file: .env
+    restart: always
     networks:
       - web
-    depends_on:
-      - nginx
+    expose:
+      - 3000
+
+volumes:
+  certbot-etc:
+  certbot-var:
+  db_data:
+  wp_data:
+
+networks:
+  web:
 
 volumes:
   certbot-etc:
