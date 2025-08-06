@@ -55,6 +55,58 @@ docker compose up -d nginx
 
 > **ВАЖНО**: Nginx запускается с упрощенной конфигурацией, которая не требует наличия других сервисов (wordpress, nextjs) для обслуживания путей проверки доменов.
 
+Упрощенная конфигурация nginx включает только серверы на порту 80 для обслуживания путей `/.well-known/acme-challenge/` и редиректы на HTTPS. Серверы на порту 443 временно возвращают код 503 для всех запросов до запуска соответствующих сервисов.
+
+В файле `nginx.conf` упрощенная конфигурация реализована следующим образом:
+
+1. На этапе получения SSL-сертификатов в сервере `panel.ustroy.webtm.ru` на порту 443 следующие строки **закомментированы**:
+
+```nginx
+# Временно отключаем обработку PHP до запуска wordpress
+# location ~ \..*\.php$ {
+#     fastcgi_pass wordpress:9000;
+#     fastcgi_index index.php;
+#     fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+#     fastcgi_param HTTPS on;
+#     fastcgi_param HTTP_X_FORWARDED_PROTO https;
+#     include fastcgi_params;
+# }
+```
+
+И вместо них добавлена заглушка, которая **раскомментирована**:
+
+```nginx
+# Временная заглушка для PHP-файлов
+location ~ \..*\.php$ {
+    return 503;
+}
+```
+
+2. На этапе получения SSL-сертификатов в сервере `ustroy.webtm.ru` на порту 443 следующие строки **закомментированы**:
+
+```nginx
+# Временно отключаем проксирование до запуска nextjs
+# location / {
+#     proxy_pass http://nextjs:3000;
+#     proxy_http_version 1.1;
+#     proxy_set_header Upgrade $http_upgrade;
+#     proxy_set_header Connection 'upgrade';
+#     proxy_set_header Host $host;
+#     proxy_cache_bypass $http_upgrade;
+# }
+```
+
+И вместо них добавлена заглушка, которая **раскомментирована**:
+
+```nginx
+# Временная заглушка для ustroy.webtm.ru
+location / {
+    return 503;
+}
+```
+
+Такая конфигурация позволяет nginx запуститься без зависимости от других сервисов и обслуживать пути для проверки доменов, необходимые для получения SSL-сертификатов.
+
 ### 3. Получение SSL-сертификатов
 
 После запуска контейнера nginx выполните команду для получения сертификатов:
@@ -68,68 +120,75 @@ docker compose run --rm certbot-init
 
 > **ВАЖНО**: После успешного получения сертификатов необходимо будет восстановить полную конфигурацию nginx для работы с WordPress и Next.js.
 
+> **ПРИМЕЧАНИЕ**: В текущей конфигурации nginx серверы на порту 443 возвращают код 503 для всех запросов, так как сервисы wordpress и nextjs еще не запущены. Это нормально на этапе получения сертификатов.
+
 ### 4. Восстановление полной конфигурации nginx
 
 После успешного получения SSL-сертификатов необходимо восстановить полную конфигурацию nginx для работы с WordPress и Next.js:
 
-1. Верните полную конфигурацию nginx, раскомментировав серверы на порту 443 в файле `nginx.conf`:
+1. В файле `nginx.conf` для сервера `panel.ustroy.webtm.ru` на порту 443 замените заглушку для PHP-файлов на рабочую конфигурацию:
 
+Было:
 ```nginx
-server {
-    listen 443 ssl;
-    server_name panel.ustroy.webtm.ru;
+# Временно отключаем обработку PHP до запуска wordpress
+# location ~ \..*\.php$ {
+#     fastcgi_pass wordpress:9000;
+#     fastcgi_index index.php;
+#     fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+#     fastcgi_param HTTPS on;
+#     fastcgi_param HTTP_X_FORWARDED_PROTO https;
+#     include fastcgi_params;
+# }
 
-    ssl_certificate /etc/letsencrypt/live/ustroy.webtm.ru/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/ustroy.webtm.ru/privkey.pem;
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_ciphers HIGH:!aNULL:!MD5;
-
-    client_max_body_size 64m;
-
-    root /var/www/html;
-    index index.php;
-
-    # Редирект с главной страницы на /wp-admin
-    location = / {
-        return 302 /wp-admin;
-    }
-
-    location / {
-        try_files $uri $uri/ /index.php?$args;
-    }
-
-    location ~ \..*\.php$ {
-        fastcgi_pass wordpress:9000;
-        fastcgi_index index.php;
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-        fastcgi_param HTTPS on;
-        fastcgi_param HTTP_X_FORWARDED_PROTO https;
-        include fastcgi_params;
-    }
-
-    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
-        expires max;
-        log_not_found off;
-    }
+# Временная заглушка для PHP-файлов
+location ~ \..*\.php$ {
+    return 503;
 }
+```
 
-server {
-    listen 443 ssl;
-    server_name ustroy.webtm.ru;
+Станет:
+```nginx
+# Обработка PHP-файлов через WordPress
+location ~ \..*\.php$ {
+    fastcgi_pass wordpress:9000;
+    fastcgi_index index.php;
+    fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    fastcgi_param HTTPS on;
+    fastcgi_param HTTP_X_FORWARDED_PROTO https;
+    include fastcgi_params;
+}
+```
 
-    ssl_certificate /etc/letsencrypt/live/ustroy.webtm.ru/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/ustroy.webtm.ru/privkey.pem;
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_ciphers HIGH:!aNULL:!MD5;
+2. Для сервера `ustroy.webtm.ru` на порту 443 замените заглушку для проксирования на рабочую конфигурацию:
 
-    location / {
-        proxy_pass http://nextjs:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-    }
+Было:
+```nginx
+# Временно отключаем проксирование до запуска nextjs
+# location / {
+#     proxy_pass http://nextjs:3000;
+#     proxy_http_version 1.1;
+#     proxy_set_header Upgrade $http_upgrade;
+#     proxy_set_header Connection 'upgrade';
+#     proxy_set_header Host $host;
+#     proxy_cache_bypass $http_upgrade;
+# }
+
+# Временная заглушка для ustroy.webtm.ru
+location / {
+    return 503;
+}
+```
+
+Станет:
+```nginx
+# Проксирование запросов к Next.js
+location / {
+    proxy_pass http://nextjs:3000;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_set_header Host $host;
+    proxy_cache_bypass $http_upgrade;
 }
 ```
 
