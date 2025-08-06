@@ -13,7 +13,7 @@ const Hero = ({
   text2,
 }: HeroProps) => {
   return (
-    <main className="cont ind">
+    <main className="cont mb-6 md:mb-8">
       <FadeIn>
         <div className="flex flex-col gap-4">
           {title ? (
@@ -33,12 +33,12 @@ const Hero = ({
             {buttonText ? (
               <Brief
                 btnText={buttonText}
-                className="col-span-1 btn btn-lg btn-block md:btn-wide font-medium text-white btn-primary hover:bg-base-100 hover:text-primary hover:border-primary hover:border-2"
+                className="col-span-1 btn btn-lg btn-block md:btn-wide font-medium text-white btn-primary hover:bg-base-100 hover:text-primary hover:border-primary hover:border-2 order-3 md:order-1"
               />
             ) : (
               ''
             )}
-            <div className="col-span-auto flex flex-col md:flex-row gap-6 md:gap-14">
+            <div className="col-span-auto flex flex-col md:flex-row gap-6 md:gap-14 order-1 md:order-2">
               {text1 && (
                 <p className="border-t-[1px] border-black pt-2">{text1}</p>
               )}

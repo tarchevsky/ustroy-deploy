@@ -4,7 +4,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'ustroy.teziscam.ru',
+        hostname: 'panel.ustroy.art',
       },
     ],
   },

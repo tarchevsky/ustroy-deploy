@@ -56,9 +56,10 @@ const ProjectFilters: React.FC<ProjectFiltersProps> = ({
       className={`ind cont carousel carousel-center gap-2 py-2 w-full ${className}`}
     >
       <button
-        className={`btn btn-primary text-white whitespace-nowrap ${
+        className={`btn btn-md md:btn-lg btn-primary text-white font-medium text-lg md:text-xl px-4 whitespace-nowrap ${
           selectedCategory ? 'btn-outline bg-white border-white text-black' : ''
         }`}
+        style={{ fontFamily: 'Commissioner Variable, sans-serif' }}
         onClick={() => onCategoryChange(null)}
       >
         Все проекты
@@ -66,11 +67,12 @@ const ProjectFilters: React.FC<ProjectFiltersProps> = ({
       {uniqueCategories.map((cat) => (
         <button
           key={cat.slug}
-          className={`btn bg-white text-black border border-gray-200 whitespace-nowrap ${
+          className={`btn btn-md md:btn-lg bg-white text-black font-medium text-lg md:text-xl px-4 border border-gray-200 whitespace-nowrap ${
             selectedCategory === cat.slug
               ? 'border-primary bg-primary border-2 text-primary'
               : ''
           }`}
+          style={{ fontFamily: 'Commissioner Variable, sans-serif' }}
           onClick={() => onCategoryChange(cat.slug)}
         >
           {cat.name}
