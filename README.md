@@ -90,7 +90,7 @@ https://sitename.ru/api/revalidate?path=/&secret=123456
 
 ## 1. Подготовка
 
-1. Убедитесь, что DNS доменов `ustroy.art` и `panel.ustroy.art` указывают на IP вашего сервера.
+1. Убедитесь, что DNS доменов `ustroy.art` и `upravdom.ustroy.art` указывают на IP вашего сервера.
 2. Откройте порты 80 и 443 на сервере (firewall, cloud-панель и т.д.).
 3. Проверьте файл `.env`:
    - Email для certbot (`youremail@domain.com` в `docker-compose.yml`) — замените на свой.
@@ -128,7 +128,7 @@ https://sitename.ru/api/revalidate?path=/&secret=123456
 - **Next.js сайт:**  
   Откройте https://ustroy.art — должен открыться основной сайт.
 - **WordPress админка:**  
-  Откройте https://panel.ustroy.art/wp-login.php  
+  Откройте https://upravdom.ustroy.art/wp-login.php  
   Введите логин и пароль из `.env` (`WORDPRESS_ADMIN_USER`, `WORDPRESS_ADMIN_PASSWORD`).
 
 ---
