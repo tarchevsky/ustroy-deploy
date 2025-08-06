@@ -44,10 +44,6 @@ const config: Config = {
             'padding-left': [cont_md],
             'padding-right': [cont_md],
           },
-          '@screen 2xl': {
-            'padding-left': [cont_xxl],
-            'padding-right': [cont_xxl],
-          },
         },
         '.cont-left': {
           'padding-left': [cont_xs],
@@ -57,9 +53,6 @@ const config: Config = {
           '@screen md': {
             'padding-left': [cont_md],
           },
-          '@screen 2xl': {
-            'padding-left': [cont_xxl],
-          },
         },
         '.cont-right': {
           'padding-right': [cont_xs],
@@ -68,9 +61,6 @@ const config: Config = {
           },
           '@screen md': {
             'padding-right': [cont_md],
-          },
-          '@screen 2xl': {
-            'padding-right': [cont_xxl],
           },
         },
       }
