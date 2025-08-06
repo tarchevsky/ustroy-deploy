@@ -7,15 +7,24 @@ echo "🚀 Starting deployment process..."
 echo "📂 Creating required directories..."
 mkdir -p certbot/www certbot/conf
 
-# Start database and WordPress
-echo "🐳 Starting database and WordPress..."
+# Start database
+echo "🐳 Starting database..."
 docker compose up -d db
 
 echo "⏳ Waiting for database to be ready..."
-until docker compose exec -T db mysqladmin ping -h localhost -u${MYSQL_USER} -p${MYSQL_PASSWORD} --silent; do
+until docker compose exec -T db mariadb --user=root --password="${MYSQL_ROOT_PASSWORD}" -e "SELECT 1" >/dev/null 2>&1; do
     echo "⏳ Waiting for database..."
     sleep 5
 done
+
+# Create database and user if not exists
+echo "🔧 Setting up database and user..."
+docker compose exec -T db mariadb --user=root --password="${MYSQL_ROOT_PASSWORD}" -e "
+    CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};
+    CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
+    GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'%';
+    FLUSH PRIVILEGES;
+"
 
 echo "🚀 Starting WordPress..."
 docker compose up -d wordpress
