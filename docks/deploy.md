@@ -122,34 +122,25 @@ docker compose run --rm certbot-init
 
 > **ПРИМЕЧАНИЕ**: В текущей конфигурации nginx серверы на порту 443 возвращают код 503 для всех запросов, так как сервисы wordpress и nextjs еще не запущены. Это нормально на этапе получения сертификатов.
 
-### 4. Восстановление полной конфигурации nginx
+### 4. Настройка WordPress
 
-После успешного получения SSL-сертификатов необходимо восстановить полную конфигурацию nginx для работы с WordPress и Next.js:
+Перед запуском Next.js необходимо полностью настроить WordPress:
 
-1. В файле `nginx.conf` для сервера `panel.ustroy.webtm.ru` на порту 443 замените заглушку для PHP-файлов на рабочую конфигурацию:
+1. Запустите сервисы базы данных и WordPress:
+
+```bash
+# Запуск сервисов базы данных и WordPress
+docker compose up -d db wordpress
+```
+
+2. Восстановите полную конфигурацию nginx для работы с WordPress:
+
+В файле `nginx.conf` для сервера `panel.ustroy.webtm.ru` на порту 443 замените заглушку для PHP-файлов на рабочую конфигурацию:
 
 Было:
 ```nginx
 # Временно отключаем обработку PHP до запуска wordpress
 # location ~ \..*\.php$ {
-#     fastcgi_pass wordpress:9000;
-#     fastcgi_index index.php;
-#     fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-#     fastcgi_param HTTPS on;
-#     fastcgi_param HTTP_X_FORWARDED_PROTO https;
-#     include fastcgi_params;
-# }
-
-# Временная заглушка для PHP-файлов
-location ~ \..*\.php$ {
-    return 503;
-}
-```
-
-Станет:
-```nginx
-# Обработка PHP-файлов через WordPress
-location ~ \..*\.php$ {
     fastcgi_pass wordpress:9000;
     fastcgi_index index.php;
     fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
@@ -159,30 +150,33 @@ location ~ \..*\.php$ {
 }
 ```
 
-2. Для сервера `ustroy.webtm.ru` на порту 443 замените заглушку для проксирования на рабочую конфигурацию:
+3. Перезапустите nginx с новой конфигурацией:
+
+```bash
+# Перезапуск nginx с конфигурацией для WordPress
+docker compose restart nginx
+```
+
+4. Откройте в браузере `https://panel.ustroy.webtm.ru` и выполните инициализацию WordPress:
+   - Выберите язык
+   - Укажите название сайта
+   - Создайте учетную запись администратора
+   - Войдите в панель администратора
+   - Установите необходимые плагины (включая WP GraphQL)
+   - Настройте permalinks (Настройки → Постоянные ссылки → выберите "Название записи")
+
+> **ВАЖНО**: WordPress должен быть полностью настроен и работать по адресу `https://panel.ustroy.webtm.ru` перед запуском Next.js, иначе сборка Next.js завершится ошибкой из-за недоступности эндпоинта `WORDPRESS_GRAPHQL_ENDPOINT`.
+
+### 5. Запуск Next.js
+
+После полной настройки WordPress можно запускать Next.js:
+
+1. В файле `nginx.conf` для сервера `ustroy.webtm.ru` на порту 443 замените заглушку для проксирования на рабочую конфигурацию:
 
 Было:
 ```nginx
 # Временно отключаем проксирование до запуска nextjs
 # location / {
-#     proxy_pass http://nextjs:3000;
-#     proxy_http_version 1.1;
-#     proxy_set_header Upgrade $http_upgrade;
-#     proxy_set_header Connection 'upgrade';
-#     proxy_set_header Host $host;
-#     proxy_cache_bypass $http_upgrade;
-# }
-
-# Временная заглушка для ustroy.webtm.ru
-location / {
-    return 503;
-}
-```
-
-Станет:
-```nginx
-# Проксирование запросов к Next.js
-location / {
     proxy_pass http://nextjs:3000;
     proxy_http_version 1.1;
     proxy_set_header Upgrade $http_upgrade;
@@ -192,23 +186,7 @@ location / {
 }
 ```
 
-На всякий случай (важно) закомментированная версия:
-
-```nginx
-# server {
-    #     listen 443 ssl;
-    #     server_name panel.ustroy.webtm.ru;
-    #
-    #     ssl_certificate /etc/letsencrypt/live/ustroy.webtm.ru/fullchain.pem;
-    #     ssl_certificate_key /etc/letsencrypt/live/ustroy.webtm.ru/privkey.pem;
-    #     ssl_protocols TLSv1.2 TLSv1.3;
-    #     ssl_ciphers HIGH:!aNULL:!MD5;
-    #
-    #     client_max_body_size 64m;
-    #
-    #     root /var/www/html;
-    #     index index.php;
-    #
+2. Перезапустите nginx с полной конфигурацией:
     #     # Редирект с главной страницы на /wp-admin
     #     location = / {
     #         return 302 /wp-admin;
