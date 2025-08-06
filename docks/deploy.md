@@ -6,16 +6,16 @@
 - Убедитесь, что директории `./certbot/www` и `./certbot/conf` существуют (создаются автоматически)
 - Убедитесь, что домены `ustroy.webtm.ru` и `panel.ustroy.webtm.ru` уже направлены на сервер
 
-## 2. Первый этап: только WordPress и сертификаты
+## 2. Первый этап: только http (без ssl)
 
-1. Используйте конфиг `nginx.wp-only.conf` для nginx:
+1. Используйте конфиг `nginx.wp-httponly.conf` для nginx:
    В файле `docker-compose.yml` укажите:
    ```yaml
    services:
      nginx:
        ...
        volumes:
-         - ./nginx.wp-only.conf:/etc/nginx/nginx.conf:ro
+         - ./nginx.wp-httponly.conf:/etc/nginx/nginx.conf:ro
          ...
    ```
 
@@ -31,19 +31,34 @@
      --agree-tos --no-eff-email --force-renewal
    ```
 
-4. Перезапустите nginx:
+4. Остановите nginx:
    ```sh
-   docker compose restart nginx
-   ```
-
-5. Запустите WordPress и базу данных:
-   ```sh
-   docker compose up -d db wordpress
+   docker compose stop nginx
    ```
 
 ---
 
-## 3. Ручное наполнение WordPress
+## 3. Второй этап: WordPress с ssl
+
+1. Используйте конфиг `nginx.wp-only.conf` для nginx (теперь с ssl):
+   В файле `docker-compose.yml` укажите:
+   ```yaml
+   services:
+     nginx:
+       ...
+       volumes:
+         - ./nginx.wp-only.conf:/etc/nginx/nginx.conf:ro
+         ...
+   ```
+
+2. Запустите nginx, WordPress и базу данных:
+   ```sh
+   docker compose up -d nginx db wordpress
+   ```
+
+---
+
+## 4. Ручное наполнение WordPress
 
 - Перейдите на https://panel.ustroy.webtm.ru
 - Выполните первичную настройку WordPress, создайте нужные страницы/контент
@@ -51,7 +66,7 @@
 
 ---
 
-## 4. Второй этап: подключение Next.js
+## 5. Третий этап: подключение Next.js
 
 1. После наполнения WordPress измените volume nginx на финальный конфиг:
    В файле `docker-compose.yml` замените:
@@ -78,7 +93,7 @@
 
 ---
 
-## 5. Обновление сертификатов (автоматически)
+## 6. Обновление сертификатов (автоматически)
 
 - certbot внутри контейнера будет автоматически обновлять сертификаты каждые 7 дней.
 - Для ручного обновления можно выполнить:
@@ -88,7 +103,7 @@
 
 ---
 
-## 6. Полная остановка всех сервисов
+## 7. Полная остановка всех сервисов
 
 ```sh
 docker compose down
