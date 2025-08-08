@@ -46,9 +46,7 @@ export const WorkshopLoad: React.FC<WorkshopLoadProps> = ({ workshopName }) => {
   useEffect(() => {
     setLoading(true)
     setError(null)
-    fetch(
-      'https://ustroysite.bubbleapps.io/version-live/api/1.1/wf/manufacture',
-    )
+    fetch(process.env.NEXT_PUBLIC_MANUFACTURE_API_ENDPOINT || '')
       .then((res) => res.json())
       .then((json) => {
         const found = json.manufactures.find(
