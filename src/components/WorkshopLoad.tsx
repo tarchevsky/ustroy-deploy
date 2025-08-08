@@ -47,7 +47,7 @@ export const WorkshopLoad: React.FC<WorkshopLoadProps> = ({ workshopName }) => {
     setLoading(true)
     setError(null)
     fetch(
-      'https://ustroysite.bubbleapps.io/version-test/api/1.1/wf/manufacture',
+      'https://ustroysite.bubbleapps.io/version-live/api/1.1/wf/manufacture',
     )
       .then((res) => res.json())
       .then((json) => {

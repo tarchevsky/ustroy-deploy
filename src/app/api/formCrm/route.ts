@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
       process.env.CRM_USER_TOKEN || '1753103270642x580481445228543900'
 
     const crmRes = await fetch(
-      'https://ustroysite.bubbleapps.io/version-test/api/1.1/wf/form',
+      'https://ustroysite.bubbleapps.io/version-live/api/1.1/wf/form',
       {
         method: 'POST',
         headers: {
