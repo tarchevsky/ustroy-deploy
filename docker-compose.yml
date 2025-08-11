@@ -3,13 +3,15 @@ services:
     build: .
     env_file: .env
     restart: always
-    depends_on:
-      - wordpress
-      - nginx
     networks:
       - web
     expose:
       - 3000
+    depends_on:
+      wordpress:
+        condition: service_healthy
+      nginx:
+        condition: service_started
 
   nginx:
     image: nginx:1.25-alpine
@@ -20,7 +22,8 @@ services:
       - ./public:/usr/share/nginx/html:ro
       - wp_data:/var/www/html:ro
     depends_on:
-      - wordpress
+      wordpress:
+        condition: service_healthy
     ports:
       - '80:80'
       - '443:443'
@@ -52,10 +55,11 @@ services:
     ports:
       - '3306:3306'
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u${MYSQL_USER}", "-p${MYSQL_PASSWORD}"]
-      interval: 5s
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
 
   wordpress:
     image: wordpress:6.5-fpm-alpine
@@ -80,6 +84,12 @@ services:
     volumes:
       - wp_data:/var/www/html
       - ./docker/php-custom.ini:/usr/local/etc/php/conf.d/99-custom.ini:ro
+    healthcheck:
+      test: ["CMD", "sh", "-c", "php-fpm -t && curl -f http://localhost:9000/wp-admin/admin-ajax.php || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
 
   certbot-init:
     image: certbot/certbot
