@@ -75,7 +75,10 @@ services:
     expose:
       - 3000
     depends_on:
-      - nginx
+      wordpress:
+        condition: service_healthy
+      nginx:
+        condition: service_started
 
   certbot:
     image: certbot/certbot
