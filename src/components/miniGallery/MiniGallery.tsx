@@ -224,6 +224,26 @@ const MiniGallery: FC<MiniGalleryProps> = ({ images }) => {
     }
   }, [])
 
+  // Функция для оптимизации URL изображений
+  const optimizeImageUrl = (
+    url: string,
+    width: number = 260,
+    height: number = 180,
+  ) => {
+    if (!url) return url
+
+    // Если URL уже содержит параметры оптимизации, не добавляем повторно
+    if (url.includes('w=') || url.includes('h=')) {
+      return url
+    }
+
+    const separator = url.includes('?') ? '&' : '?'
+    // Используем только ширину для масштабирования с сохранением пропорций
+    // auto=compress,format для автоматического сжатия и выбора формата
+    // q=80 для хорошего качества при меньшем размере файла
+    return `${url}${separator}w=${width}&auto=compress,format&q=80`
+  }
+
   if (!images || images.length === 0) {
     return null
   }
@@ -269,11 +289,16 @@ const MiniGallery: FC<MiniGalleryProps> = ({ images }) => {
                   data-caption={img.altText}
                 >
                   <img
-                    src={img.sourceUrl}
+                    src={optimizeImageUrl(img.sourceUrl, 260, 180)}
                     alt={img.altText}
                     className="w-full h-full object-cover hover:opacity-90 transition-opacity"
                     loading="lazy"
                     onLoad={checkScroll}
+                    sizes="260px"
+                    srcSet={`
+                      ${optimizeImageUrl(img.sourceUrl, 260, 180)} 1x,
+                      ${optimizeImageUrl(img.sourceUrl, 520, 360)} 2x
+                    `}
                   />
                 </a>
               </div>
