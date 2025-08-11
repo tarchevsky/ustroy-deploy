@@ -47,6 +47,7 @@ const classMap: Record<string, string> = {
   'wp-block-file': 'flex items-center p-4 bg-gray-100 rounded',
   'wp-block-media-text': 'grid md:grid-cols-2 gap-4 my-8',
   'wp-block-embed': 'my-8',
+  'size-large': 'w-full',
 
   // Колонки
   'wp-block-columns': 'flex flex-wrap md:flex-nowrap gap-6 mb-8',
@@ -134,12 +135,19 @@ export const wpToTailwind = (content: string): string => {
   if (!content) return ''
   let transformedContent = content
 
+  // Сначала обрабатываем классы из classMap, но не перезаписываем существующие классы
   Object.entries(allClassMaps).forEach(([wpClass, tailwindClass]) => {
-    if (!tailwindClass) return // Пропускаем пустые соответствия
+    if (!tailwindClass) return
 
-    const regex = new RegExp(`class="([^\"]*?)${wpClass}([^\"]*?)"`, 'g')
+    // Ищем элементы, у которых есть wpClass, но нет соответствующего tailwindClass
+    const regex = new RegExp(`class="([^\"]*?\\b${wpClass}\\b)([^\"]*?)"`, 'g')
     transformedContent = transformedContent.replace(regex, (match, p1, p2) => {
-      return `class="${p1}${tailwindClass}${p2}"`
+      // Проверяем, что tailwindClass еще не добавлен
+      if (!new RegExp(`\\b${tailwindClass}\\b`).test(p1 + p2)) {
+        // Сохраняем все существующие классы и добавляем tailwindClass
+        return `class="${p1} ${tailwindClass}${p2}"`
+      }
+      return match
     })
   })
 

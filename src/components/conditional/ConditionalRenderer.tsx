@@ -13,7 +13,6 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import AboutBlock from '../aboutBlock/AboutBlock'
 import ModalContactForm from '../contactForm/ModalContactForm'
-import ContentBlock from '../contentBlock/ContentBlock'
 import ListOfContentsBlock from '../listOfContents/ListOfContentsBlock'
 import MiniGallery from '../miniGallery/MiniGallery'
 import PostsCarousel from '../postsCarousel/PostsCarousel'
@@ -325,13 +324,19 @@ const ConditionalPostsCarousel = ({
   return null
 }
 
-// Добавляем компонент для кастомного вывода контента
+// Компонент для кастомного вывода контента
 const ConditionalCustomContent = ({ content }: { content: string }) => {
   if (!content) return null
+
+  // Обрабатываем контент с помощью wpToTailwind
+  const processedContent = wpToTailwind(content)
+
   return (
     <div className="cont px-[16px]">
+      {/* Убираем prose, так как он может переопределять стили */}
       <section className="prose max-w-full">
-        <ContentBlock content={wpToTailwind(content)} />
+        {/* Используем dangerouslySetInnerHTML напрямую, чтобы сохранить все классы */}
+        <div dangerouslySetInnerHTML={{ __html: processedContent }} />
       </section>
     </div>
   )
