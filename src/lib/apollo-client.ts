@@ -11,25 +11,46 @@ import {
 let apolloClient: ApolloClient<NormalizedCacheObject> | undefined
 
 function createApolloClient() {
-  // Во время Docker build используем внутренний адрес
-  let graphqlEndpoint = process.env.WORDPRESS_GRAPHQL_ENDPOINT || 'http://localhost:3001/graphql'
-  
-  // Если сборка внутри Docker и WordPress недоступен, используем внутренний адрес
-  if (process.env.NODE_ENV === 'production' && typeof window === 'undefined') {
-    graphqlEndpoint = 'http://wordpress:9000/graphql'
-  }
+  const graphqlEndpoint = process.env.WORDPRESS_GRAPHQL_ENDPOINT || 'http://localhost:3001/graphql'
   
   return new ApolloClient({
     ssrMode: typeof window === 'undefined',
     link: new HttpLink({
       uri: graphqlEndpoint,
-      fetch: (uri, options) => {        
+      fetch: (uri, options) => {
+        // Во время Docker build возвращаем пустой ответ
+        if (process.env.NODE_ENV === 'production' && typeof window === 'undefined') {
+          console.warn('Skipping GraphQL request during build:', uri)
+          return Promise.resolve(new Response(JSON.stringify({
+            data: {
+              pages: { nodes: [] },
+              categories: { edges: [] },
+              siteSettings: { siteSettingsGroup: null },
+              page: null,
+              category: null,
+              posts: { edges: [] }
+            }
+          }), { 
+            status: 200, 
+            headers: { 'Content-Type': 'application/json' }
+          }))
+        }
+        
         return fetch(uri, {
           ...options,
           signal: AbortSignal.timeout(30000)
         }).catch(error => {
           console.warn('GraphQL request failed:', error.message)
-          return new Response('{"data": {}}', { 
+          return new Response(JSON.stringify({
+            data: {
+              pages: { nodes: [] },
+              categories: { edges: [] },
+              siteSettings: { siteSettingsGroup: null },
+              page: null,
+              category: null,
+              posts: { edges: [] }
+            }
+          }), { 
             status: 200, 
             headers: { 'Content-Type': 'application/json' }
           })
