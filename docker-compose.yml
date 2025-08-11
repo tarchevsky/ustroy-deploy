@@ -5,6 +5,7 @@ services:
     restart: always
     depends_on:
       - wordpress
+      - nginx
     networks:
       - web
     expose:
@@ -50,6 +51,11 @@ services:
       - web
     ports:
       - '3306:3306'
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u${MYSQL_USER}", "-p${MYSQL_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   wordpress:
     image: wordpress:6.5-fpm-alpine
@@ -65,7 +71,8 @@ services:
         define('WP_SITEURL', 'https://panel.ustroy.art');
     env_file: .env
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - web
     expose:
