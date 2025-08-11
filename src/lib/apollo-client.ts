@@ -11,25 +11,22 @@ import {
 let apolloClient: ApolloClient<NormalizedCacheObject> | undefined
 
 function createApolloClient() {
-  const graphqlEndpoint = process.env.WORDPRESS_GRAPHQL_ENDPOINT || 'http://localhost:3001/graphql'
+  // Во время Docker build используем внутренний адрес
+  let graphqlEndpoint = process.env.WORDPRESS_GRAPHQL_ENDPOINT || 'http://localhost:3001/graphql'
+  
+  // Если сборка внутри Docker и WordPress недоступен, используем внутренний адрес
+  if (process.env.NODE_ENV === 'production' && typeof window === 'undefined') {
+    graphqlEndpoint = 'http://wordpress:9000/graphql'
+  }
   
   return new ApolloClient({
     ssrMode: typeof window === 'undefined',
     link: new HttpLink({
       uri: graphqlEndpoint,
-      fetch: (uri, options) => {
-        // Во время сборки Docker пропускаем GraphQL запросы
-        if (process.env.NODE_ENV === 'production' && typeof window === 'undefined') {
-          console.warn('Skipping GraphQL request during Docker build')
-          return Promise.resolve(new Response('{"data": {}}', { 
-            status: 200, 
-            headers: { 'Content-Type': 'application/json' }
-          }))
-        }
-        
+      fetch: (uri, options) => {        
         return fetch(uri, {
           ...options,
-          signal: AbortSignal.timeout(10000)
+          signal: AbortSignal.timeout(30000)
         }).catch(error => {
           console.warn('GraphQL request failed:', error.message)
           return new Response('{"data": {}}', { 
