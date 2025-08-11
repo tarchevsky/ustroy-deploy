@@ -10,16 +10,16 @@ echo ""
 
 # Остановка существующих контейнеров
 echo "🛑 Остановка существующих контейнеров..."
-docker-compose down
+docker compose down
 
 # Запуск с пересборкой
 echo "🏗️ Запуск с пересборкой..."
-docker-compose up --build -d
+docker compose up --build -d
 
 echo ""
 echo "✅ Запуск завершен! Проверьте статус:"
-echo "📋 docker-compose ps"
-echo "📋 docker-compose logs -f"
+echo "📋 docker compose ps"
+echo "📋 docker compose logs -f"
 echo ""
 echo "🌐 Сайты должны быть доступны по:"
 echo "   - https://ustroy.art (Next.js)"

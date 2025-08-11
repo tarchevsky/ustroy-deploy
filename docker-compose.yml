@@ -15,6 +15,7 @@ services:
 
   nginx:
     image: nginx:1.25-alpine
+    restart: always
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - certbot-etc:/etc/letsencrypt
@@ -24,6 +25,8 @@ services:
     depends_on:
       wordpress:
         condition: service_healthy
+      nextjs:
+        condition: service_started
     ports:
       - '80:80'
       - '443:443'
