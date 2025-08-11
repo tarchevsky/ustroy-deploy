@@ -11,84 +11,17 @@ import {
 let apolloClient: ApolloClient<NormalizedCacheObject> | undefined
 
 function createApolloClient() {
-  const graphqlEndpoint = process.env.WORDPRESS_GRAPHQL_ENDPOINT || 'http://localhost:3001/graphql'
-  
   return new ApolloClient({
-    ssrMode: typeof window === 'undefined',
+    ssrMode: typeof window === 'undefined', // true для серверного рендеринга
     link: new HttpLink({
-      uri: graphqlEndpoint,
-      fetch: (uri, options) => {
-        // Во время Docker build возвращаем пустой ответ
-        if (process.env.NODE_ENV === 'production' && typeof window === 'undefined') {
-          console.warn('Skipping GraphQL request during build:', uri)
-          return Promise.resolve(new Response(JSON.stringify({
-            data: {
-              pages: { nodes: [] },
-              categories: { edges: [] },
-              siteSettings: { 
-                siteSettingsGroup: {
-                  typesOfContent: [],
-                  siteName: '',
-                  siteDescription: ''
-                } 
-              },
-              page: { 
-                content: '',
-                title: '',
-                typesOfContent: []
-              },
-              category: { 
-                name: '',
-                description: '',
-                posts: { edges: [] }
-              },
-              posts: { edges: [] }
-            }
-          }), { 
-            status: 200, 
-            headers: { 'Content-Type': 'application/json' }
-          }))
-        }
-        
-        return fetch(uri, {
-          ...options,
-          signal: AbortSignal.timeout(30000)
-        }).catch(error => {
-          console.warn('GraphQL request failed:', error.message)
-          return new Response(JSON.stringify({
-            data: {
-              pages: { nodes: [] },
-              categories: { edges: [] },
-              siteSettings: { 
-                siteSettingsGroup: {
-                  typesOfContent: [],
-                  siteName: '',
-                  siteDescription: ''
-                } 
-              },
-              page: { 
-                content: '',
-                title: '',
-                typesOfContent: []
-              },
-              category: { 
-                name: '',
-                description: '',
-                posts: { edges: [] }
-              },
-              posts: { edges: [] }
-            }
-          }), { 
-            status: 200, 
-            headers: { 'Content-Type': 'application/json' }
-          })
-        })
-      }
+      uri: process.env.WORDPRESS_GRAPHQL_ENDPOINT,
+      // Дополнительные настройки, например, заголовки авторизации, если нужно
+      // headers: { ... }
     }),
     cache: new InMemoryCache(),
     defaultOptions: {
       query: {
-        fetchPolicy: 'no-cache',
+        fetchPolicy: 'no-cache', // Для ISR лучше не использовать кеширование запросов
         errorPolicy: 'all',
       },
     },
