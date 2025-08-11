@@ -34,21 +34,30 @@ services:
     command: >
       sh -c "
         echo 'Ожидание готовности GraphQL endpoint...';
-        for i in $$(seq 1 60); do
-          echo \"Попытка $$i из 60...\";
-          if curl -s -f -X POST \
-            -H 'Content-Type: application/json' \
-            -d '{\"query\":\"query { __typename }\"}' \
-            'https://panel.ustroy.art/graphql' > /dev/null 2>&1; then
-            echo 'GraphQL endpoint готов!';
-            exit 0;
+        for i in $$(seq 1 120); do
+          echo \"Попытка $$i из 120...\";
+          # Сначала проверяем доступность WordPress
+          if curl -s -f -H 'Host: panel.ustroy.art' http://nginx/wp-admin/admin-ajax.php > /dev/null 2>&1; then
+            # Затем проверяем GraphQL endpoint
+            response=$$(curl -s -H 'Host: panel.ustroy.art' \
+              -H 'Content-Type: application/json' \
+              -d '{\"query\":\"query { __typename }\"}' \
+              http://nginx/graphql 2>/dev/null);
+            if echo \"$$response\" | grep -q '__typename'; then
+              echo 'GraphQL endpoint готов!';
+              exit 0;
+            else
+              echo \"GraphQL недоступен. Ответ: $$response\";
+            fi;
+          else
+            echo 'WordPress недоступен';
           fi;
-          if [ $$i -lt 60 ]; then
-            echo 'GraphQL endpoint недоступен, ожидание 5 секунд...';
-            sleep 5;
+          if [ $$i -lt 120 ]; then
+            echo 'Ожидание 3 секунды...';
+            sleep 3;
           fi;
         done;
-        echo 'GraphQL endpoint не стал доступен за 300 секунд';
+        echo 'GraphQL endpoint не стал доступен за 360 секунд';
         exit 1;
       "
 
@@ -124,8 +133,8 @@ services:
       test: ["CMD-SHELL", "pgrep -f php-fpm > /dev/null || exit 1"]
       interval: 30s
       timeout: 10s
-      retries: 10
-      start_period: 120s
+      retries: 15
+      start_period: 180s
 
   certbot-init:
     image: certbot/certbot
