@@ -25,9 +25,23 @@ function createApolloClient() {
             data: {
               pages: { nodes: [] },
               categories: { edges: [] },
-              siteSettings: { siteSettingsGroup: null },
-              page: null,
-              category: null,
+              siteSettings: { 
+                siteSettingsGroup: {
+                  typesOfContent: [],
+                  siteName: '',
+                  siteDescription: ''
+                } 
+              },
+              page: { 
+                content: '',
+                title: '',
+                typesOfContent: []
+              },
+              category: { 
+                name: '',
+                description: '',
+                posts: { edges: [] }
+              },
               posts: { edges: [] }
             }
           }), { 
@@ -45,9 +59,23 @@ function createApolloClient() {
             data: {
               pages: { nodes: [] },
               categories: { edges: [] },
-              siteSettings: { siteSettingsGroup: null },
-              page: null,
-              category: null,
+              siteSettings: { 
+                siteSettingsGroup: {
+                  typesOfContent: [],
+                  siteName: '',
+                  siteDescription: ''
+                } 
+              },
+              page: { 
+                content: '',
+                title: '',
+                typesOfContent: []
+              },
+              category: { 
+                name: '',
+                description: '',
+                posts: { edges: [] }
+              },
               posts: { edges: [] }
             }
           }), { 
