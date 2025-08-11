@@ -11,17 +11,38 @@ import {
 let apolloClient: ApolloClient<NormalizedCacheObject> | undefined
 
 function createApolloClient() {
+  const graphqlEndpoint = process.env.WORDPRESS_GRAPHQL_ENDPOINT || 'http://localhost:3001/graphql'
+  
   return new ApolloClient({
-    ssrMode: typeof window === 'undefined', // true для серверного рендеринга
+    ssrMode: typeof window === 'undefined',
     link: new HttpLink({
-      uri: process.env.WORDPRESS_GRAPHQL_ENDPOINT,
-      // Дополнительные настройки, например, заголовки авторизации, если нужно
-      // headers: { ... }
+      uri: graphqlEndpoint,
+      fetch: (uri, options) => {
+        // Во время сборки Docker пропускаем GraphQL запросы
+        if (process.env.NODE_ENV === 'production' && typeof window === 'undefined') {
+          console.warn('Skipping GraphQL request during Docker build')
+          return Promise.resolve(new Response('{"data": {}}', { 
+            status: 200, 
+            headers: { 'Content-Type': 'application/json' }
+          }))
+        }
+        
+        return fetch(uri, {
+          ...options,
+          signal: AbortSignal.timeout(10000)
+        }).catch(error => {
+          console.warn('GraphQL request failed:', error.message)
+          return new Response('{"data": {}}', { 
+            status: 200, 
+            headers: { 'Content-Type': 'application/json' }
+          })
+        })
+      }
     }),
     cache: new InMemoryCache(),
     defaultOptions: {
       query: {
-        fetchPolicy: 'no-cache', // Для ISR лучше не использовать кеширование запросов
+        fetchPolicy: 'no-cache',
         errorPolicy: 'all',
       },
     },

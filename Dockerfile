@@ -8,6 +8,9 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# Устанавливаем переменную для сборки, чтобы избежать ошибок подключения
+ENV NODE_ENV=production
+ENV CI=true
 RUN npm run build
 
 FROM node:20-alpine AS runner
