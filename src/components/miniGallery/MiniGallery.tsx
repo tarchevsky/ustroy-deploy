@@ -97,31 +97,17 @@ const MiniGallery: FC<MiniGalleryProps> = ({ images }) => {
   }
 
   const checkScroll = () => {
-    if (!scrollContainerRef.current || !containerRef.current) {
-      console.log('checkScroll: элементы не найдены')
-      return
-    }
-
     const container = containerRef.current
     const scrollContainer = scrollContainerRef.current
 
     // Принудительно обновляем размеры
-    const containerWidth = container.clientWidth
-    const scrollWidth = scrollContainer.scrollWidth
-    const scrollLeft = scrollContainer.scrollLeft
+    const containerWidth = container?.clientWidth || 0
+    const scrollWidth = scrollContainer?.scrollWidth || 0
+    const scrollLeft = scrollContainer?.scrollLeft || 0
     const maxScroll = Math.max(0, scrollWidth - containerWidth)
 
     // Всегда показываем правую стрелку, если есть место для скролла
     const showRight = scrollLeft < maxScroll - 10 || maxScroll <= 0
-
-    console.log('checkScroll', {
-      containerWidth,
-      scrollWidth,
-      scrollLeft,
-      maxScroll,
-      showLeft: scrollLeft > 10,
-      showRight,
-    })
 
     setShowLeftArrow(scrollLeft > 10)
     setShowRightArrow(showRight)
@@ -129,20 +115,15 @@ const MiniGallery: FC<MiniGalleryProps> = ({ images }) => {
 
   // Функция для принудительного обновления размеров
   const forceUpdate = () => {
-    if (!scrollContainerRef.current) return
-
-    // Принудительно вызываем проверку с небольшой задержкой
     setTimeout(() => {
       checkScroll()
       // Повторная проверка после полной загрузки изображений
       const images = scrollContainerRef.current?.querySelectorAll('img')
-      if (images) {
-        images.forEach((img) => {
-          if (!img.complete) {
-            img.onload = checkScroll
-          }
-        })
-      }
+      images?.forEach((img) => {
+        if (!img.complete) {
+          img.onload = checkScroll
+        }
+      })
 
       // Дополнительная проверка после полной загрузки страницы
       if (document.readyState !== 'complete') {
@@ -150,8 +131,9 @@ const MiniGallery: FC<MiniGalleryProps> = ({ images }) => {
       }
 
       // Проверяем, нужны ли стрелки при загрузке
-      if (scrollContainerRef.current) {
-        const { scrollWidth, clientWidth } = scrollContainerRef.current
+      const scrollContainer = scrollContainerRef.current
+      if (scrollContainer) {
+        const { scrollWidth, clientWidth } = scrollContainer
         setShowRightArrow(scrollWidth > clientWidth)
       }
     }, 300)
@@ -160,17 +142,6 @@ const MiniGallery: FC<MiniGalleryProps> = ({ images }) => {
   useEffect(() => {
     const container = containerRef.current
     const scrollContainer = scrollContainerRef.current
-    if (!container || !scrollContainer) {
-      console.error('Не удалось найти контейнеры для инициализации')
-      return
-    }
-
-    console.log('Инициализация галереи', {
-      containerWidth: container.clientWidth,
-      scrollWidth: scrollContainer.scrollWidth,
-      container,
-      scrollContainer,
-    })
 
     // Первая проверка
     checkScroll()
@@ -179,15 +150,17 @@ const MiniGallery: FC<MiniGalleryProps> = ({ images }) => {
     const initTimer = setTimeout(forceUpdate, 100)
 
     // Добавляем обработчик скролла
-    scrollContainer.addEventListener('scroll', checkScroll, { passive: true })
+    scrollContainer?.addEventListener('scroll', checkScroll, { passive: true })
 
     // Обновляем при изменении размеров окна
     const resizeObserver = new ResizeObserver(forceUpdate)
-    resizeObserver.observe(container)
+    if (container) {
+      resizeObserver.observe(container)
+    }
 
     // Принудительно обновляем видимость стрелок при загрузке изображений
-    const images = scrollContainer.querySelectorAll('img')
-    images.forEach((img) => {
+    const images = scrollContainer?.querySelectorAll('img')
+    images?.forEach((img) => {
       if (!img.complete) {
         img.onload = forceUpdate
       }
@@ -209,53 +182,32 @@ const MiniGallery: FC<MiniGalleryProps> = ({ images }) => {
     }
 
     // Используем делегирование событий
-    NativeFancybox.bind(container, delegate, options)
+    if (container) {
+      NativeFancybox.bind(container, delegate, options)
+    }
 
     // Cleanup
     return () => {
       clearTimeout(initTimer)
-      scrollContainer.removeEventListener('scroll', checkScroll)
+      scrollContainer?.removeEventListener('scroll', checkScroll)
       window.removeEventListener('load', checkScroll)
-      if (resizeObserver) {
-        resizeObserver.disconnect()
+      resizeObserver?.disconnect()
+      if (container) {
+        NativeFancybox.unbind(container)
       }
-      NativeFancybox.unbind(container)
       NativeFancybox.close()
     }
   }, [])
 
-  // Функция для оптимизации URL изображений
+  // Функция для оптимизации URL изображений через Next.js Image Optimization API
   const optimizeImageUrl = (
     url: string,
     width: number = 260,
     height: number = 180,
   ) => {
-    if (!url) return url
-
-    // Если URL уже содержит параметры оптимизации, не добавляем повторно
-    if (url.includes('w=') || url.includes('h=')) {
-      return url
-    }
-
-    const separator = url.includes('?') ? '&' : '?'
-    // Используем только ширину для масштабирования с сохранением пропорций
-    // auto=compress,format для автоматического сжатия и выбора формата
-    // q=80 для хорошего качества при меньшем размере файла
-    return `${url}${separator}w=${width}&auto=compress,format&q=80`
+    // Используем Next.js Image Optimization API
+    return `/_next/image?url=${encodeURIComponent(url)}&w=${width}&q=80`
   }
-
-  if (!images || images.length === 0) {
-    return null
-  }
-
-  // Отладочная информация
-  console.log('Render MiniGallery', {
-    imagesCount: images?.length,
-    showLeftArrow,
-    showRightArrow,
-    containerWidth: containerRef.current?.clientWidth,
-    scrollContainerWidth: scrollContainerRef.current?.scrollWidth,
-  })
 
   return (
     <div className="py-8">
@@ -289,16 +241,20 @@ const MiniGallery: FC<MiniGalleryProps> = ({ images }) => {
                   data-caption={img.altText}
                 >
                   <img
-                    src={optimizeImageUrl(img.sourceUrl, 260, 180)}
+                    src={optimizeImageUrl(img.sourceUrl, 260)}
                     alt={img.altText}
                     className="w-full h-full object-cover hover:opacity-90 transition-opacity"
                     loading="lazy"
                     onLoad={checkScroll}
                     sizes="260px"
                     srcSet={`
-                      ${optimizeImageUrl(img.sourceUrl, 260, 180)} 1x,
-                      ${optimizeImageUrl(img.sourceUrl, 520, 360)} 2x
+                      ${optimizeImageUrl(img.sourceUrl, 260)} 1x,
+                      ${optimizeImageUrl(img.sourceUrl, 520)} 2x
                     `}
+                    onError={(e) => {
+                      // Если оптимизированное изображение не загрузилось, используем оригинал
+                      e.currentTarget.src = img.sourceUrl
+                    }}
                   />
                 </a>
               </div>
