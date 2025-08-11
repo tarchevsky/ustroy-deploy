@@ -136,6 +136,13 @@ export const GET_POST_BY_SLUG = gql`
               }
             }
           }
+          ... on TypesOfContentChooseHeroLayout {
+            fieldGroupName
+            header
+            sub
+            text1
+            text2
+          }
         }
       }
       categories {

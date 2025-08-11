@@ -8,7 +8,6 @@ import { fetchHomePageData } from '@/services/pageService'
 import { fetchPageSettings } from '@/services/pageSettingsService'
 
 import { ConditionalRenderer } from '@/components/conditional/ConditionalRenderer'
-import Hero from '@/components/hero/Hero'
 import {
   transformCategories,
   transformCategoryPosts,
@@ -104,15 +103,6 @@ const HomePage = async () => {
 
   return (
     <>
-      {heroBlock && (
-        <Hero
-          title={heroBlock.header}
-          subtitle={heroBlock.sub}
-          text1={heroBlock.text1}
-          text2={heroBlock.text2}
-          buttonText="Обсудить проект"
-        />
-      )}
       {/* Импортируем contactFormFields и передаём как проп fields */}
       <ConditionalRenderer
         typesOfContent={typesOfContent}

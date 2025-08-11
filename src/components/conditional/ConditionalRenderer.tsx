@@ -13,9 +13,11 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import AboutBlock from '../aboutBlock/AboutBlock'
 import ModalContactForm from '../contactForm/ModalContactForm'
+import Hero from '../hero/Hero'
 import ListOfContentsBlock from '../listOfContents/ListOfContentsBlock'
 import MiniGallery from '../miniGallery/MiniGallery'
 import PostsCarousel from '../postsCarousel/PostsCarousel'
+import ProjectPicturesGrid from '../projects/ProjectPicturesGrid'
 import TextWithButton from '../textWithButton/TextWithButton'
 
 interface ConditionalRendererProps {
@@ -52,6 +54,19 @@ export const ConditionalRenderer = ({
       {/* Рендерим компоненты в порядке добавления в WordPress */}
       {typesOfContent.choose.map((block, index) => {
         switch (block.fieldGroupName) {
+          case 'TypesOfContentChooseHeroLayout':
+            return (
+              <Hero
+                key={index}
+                title={block.header}
+                subtitle={block.sub}
+                buttonText={block.buttonText || 'Обсудить проект'}
+                src={block.src}
+                alt={block.alt}
+                text1={block.text1}
+                text2={block.text2}
+              />
+            )
           case 'TypesOfContentChooseCustomersLayout':
             return (
               <ConditionalCompanies
@@ -118,6 +133,16 @@ export const ConditionalRenderer = ({
             }
             return null
           }
+          case 'TypesOfContentChooseProjectPicturesLayout':
+            return (
+              <ProjectPicturesGrid
+                key={index}
+                img1={block.img1}
+                img2={block.img2}
+                img3={block.img3}
+                img4={block.img4}
+              />
+            )
           default:
             return null
         }

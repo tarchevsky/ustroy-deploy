@@ -14,7 +14,7 @@ const ProjectPicturesGrid: React.FC<ProjectPicturesGridProps> = ({
   img4,
 }) => {
   return (
-    <section className="ind w-full my-8">
+    <section className="cont ind w-full my-8">
       {/* Мобильная сетка (до md): одна колонка, gap-2, нужные aspect-ratio */}
       <div className="flex flex-col gap-2 md:hidden">
         {/* img1 — высокая */}

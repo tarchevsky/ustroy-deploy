@@ -66,47 +66,6 @@ export default function WorkshopPageClient({
         </span>
         <span className="text-primary font-semibold ml-1">Цеха</span>
       </nav>
-      {showHero && (
-        <div className="mb-8">
-          <div className="mb-4 cont">
-            <h1 className="text-3xl font-bold">{heroBlock.header}</h1>
-            {heroBlock.sub && (
-              <div className="text-lg text-gray-500">{heroBlock.sub}</div>
-            )}
-            {heroBlock.text1 && <div>{heroBlock.text1}</div>}
-            {heroBlock.text2 && <div>{heroBlock.text2}</div>}
-            {heroBlock.buttonText && (
-              <button className="btn btn-primary mt-4">
-                {heroBlock.buttonText}
-              </button>
-            )}
-          </div>
-        </div>
-      )}
-      {/* Заголовок страницы под header */}
-      <div className="my-8">
-        <div className="cont">
-          <div className="mb-6">
-            <h1
-              className="font-medium break-words"
-              style={{
-                fontSize: 'clamp(1.5rem, 4vw, 2.375rem)',
-                lineHeight: '1.1',
-              }}
-            >
-              {pageTitle}
-            </h1>
-          </div>
-        </div>
-      </div>
-
-      {aboutBlock && (
-        <div className="mb-8">
-          <div>{aboutBlock.title}</div>
-        </div>
-      )}
-
-      {/* Удаляем ProjectGrid для дочерних страниц */}
       {/* Универсальный рендерер для условных блоков */}
       <ConditionalRenderer
         typesOfContent={typesOfContent}

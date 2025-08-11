@@ -120,6 +120,33 @@ export const GET_PAGE_SETTINGS = gql`
             add
             fieldGroupName
           }
+          ... on TypesOfContentChooseProjectPicturesLayout {
+            fieldGroupName
+            img1 {
+              node {
+                altText
+                sourceUrl
+              }
+            }
+            img2 {
+              node {
+                altText
+                sourceUrl
+              }
+            }
+            img3 {
+              node {
+                altText
+                sourceUrl
+              }
+            }
+            img4 {
+              node {
+                altText
+                sourceUrl
+              }
+            }
+          }
         }
       }
     }

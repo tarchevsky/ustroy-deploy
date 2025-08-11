@@ -1,7 +1,6 @@
 import { contactFormFields } from '@/app/contactFormFields'
 import AboutBlock from '@/components/aboutBlock/AboutBlock'
 import ChildCategoriesBlock from '@/components/ChildCategoriesBlock'
-import Hero from '@/components/hero/Hero'
 import PageTitle from '@/components/PageTitle'
 import { TypesOfContentChooseHeroLayout } from '@/graphql/types/pageSettingsTypes'
 import { getApolloClient } from '@/lib/apollo-client'
@@ -59,15 +58,6 @@ export default async function WpPageComponent({
             {pageData.title}
           </span>
         </nav>
-      )}
-      {heroBlock && (
-        <Hero
-          title={heroBlock.header}
-          subtitle={heroBlock.sub}
-          text1={heroBlock.text1}
-          text2={heroBlock.text2}
-          buttonText="Обсудить проект"
-        />
       )}
 
       {/* Заголовок страницы под header */}

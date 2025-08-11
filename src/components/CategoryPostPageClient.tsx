@@ -4,7 +4,6 @@ import { notFound } from 'next/navigation'
 import CategoryLinks from './categoryLinks/CategoryLinks'
 import { ConditionalRenderer } from './conditional/ConditionalRenderer'
 import { useCategoryPostData } from './hooks/useCategoryPostData'
-import ProjectPicturesGrid from './projects/ProjectPicturesGrid'
 import { Breadcrumbs } from './ui/Breadcrumbs'
 
 interface CategoryPostPageClientProps {
@@ -113,17 +112,6 @@ export default function CategoryPostPageClient({
             </div>
           </div>
         </main>
-      </div>
-
-      <div className="cont px-[16px]">
-        {projectPicturesBlock && (
-          <ProjectPicturesGrid
-            img1={projectPicturesBlock.img1}
-            img2={projectPicturesBlock.img2}
-            img3={projectPicturesBlock.img3}
-            img4={projectPicturesBlock.img4}
-          />
-        )}
       </div>
 
       {/* Универсальный рендерер для условных блоков */}
