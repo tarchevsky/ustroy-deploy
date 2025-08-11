@@ -1,13 +1,4 @@
 services:
-  nextjs:
-    build: .
-    env_file: .env
-    restart: always
-    networks:
-      - web
-    expose:
-      - 3000
-
   nginx:
     image: nginx:1.25-alpine
     volumes:
@@ -17,12 +8,63 @@ services:
       - ./public:/usr/share/nginx/html:ro
       - wp_data:/var/www/html:ro
     depends_on:
-      - nextjs
+      wordpress:
+        condition: service_healthy
     ports:
       - '80:80'
       - '443:443'
     networks:
       - web
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  graphql-wait:
+    image: curlimages/curl:8.5.0
+    networks:
+      - web
+    depends_on:
+      nginx:
+        condition: service_healthy
+      wordpress:
+        condition: service_healthy
+    command: >
+      sh -c "
+        echo 'Ожидание готовности GraphQL endpoint...';
+        for i in $$(seq 1 60); do
+          echo \"Попытка $$i из 60...\";
+          if curl -s -f -X POST \
+            -H 'Content-Type: application/json' \
+            -d '{\"query\":\"query { __typename }\"}' \
+            'https://panel.ustroy.art/graphql' > /dev/null 2>&1; then
+            echo 'GraphQL endpoint готов!';
+            exit 0;
+          fi;
+          if [ $$i -lt 60 ]; then
+            echo 'GraphQL endpoint недоступен, ожидание 5 секунд...';
+            sleep 5;
+          fi;
+        done;
+        echo 'GraphQL endpoint не стал доступен за 300 секунд';
+        exit 1;
+      "
+
+  nextjs:
+    build: .
+    env_file: .env
+    restart: always
+    networks:
+      - web
+    expose:
+      - 3000
+    depends_on:
+      graphql-wait:
+        condition: service_completed_successfully
+    environment:
+      - NODE_ENV=production
 
   certbot:
     image: certbot/certbot
@@ -48,6 +90,12 @@ services:
       - web
     ports:
       - '3306:3306'
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
 
   wordpress:
     image: wordpress:6.5-fpm-alpine
@@ -63,7 +111,8 @@ services:
         define('WP_SITEURL', 'https://panel.ustroy.art');
     env_file: .env
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - web
     expose:
@@ -71,6 +120,12 @@ services:
     volumes:
       - wp_data:/var/www/html
       - ./docker/php-custom.ini:/usr/local/etc/php/conf.d/99-custom.ini:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f php-fpm > /dev/null || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
 
   certbot-init:
     image: certbot/certbot
