@@ -3,6 +3,8 @@ services:
     build: .
     env_file: .env
     restart: always
+    depends_on:
+      - wordpress
     networks:
       - web
     expose:
@@ -17,7 +19,7 @@ services:
       - ./public:/usr/share/nginx/html:ro
       - wp_data:/var/www/html:ro
     depends_on:
-      - nextjs
+      - wordpress
     ports:
       - '80:80'
       - '443:443'
