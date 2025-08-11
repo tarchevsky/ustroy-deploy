@@ -43,11 +43,11 @@ services:
       - wp_data:/var/www/html
       - ./docker/php-custom.ini:/usr/local/etc/php/conf.d/99-custom.ini:ro
     healthcheck:
-      test: ["CMD-SHELL", "php-fpm-healthcheck || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 60s
+      test: ["CMD-SHELL", "test -f /var/www/html/wp-config.php"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
   nginx:
     image: nginx:1.25-alpine
