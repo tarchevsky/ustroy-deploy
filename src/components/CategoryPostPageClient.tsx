@@ -76,6 +76,11 @@ export default function CategoryPostPageClient({
       item.fieldGroupName === 'TypesOfContentChooseProjectPicturesLayout',
   )
 
+  const yearBlock = post.typesOfContent?.choose?.find(
+    (item: any) => item.fieldGroupName === 'TypesOfContentChooseYearLayout',
+  )
+  const customYear = yearBlock?.number
+
   // Хлебные крошки
   const breadcrumbs: Array<{ name: string; href?: string }> = [
     { name: 'Главная', href: '/' },
@@ -107,9 +112,14 @@ export default function CategoryPostPageClient({
                 {categoryName}
               </Link>
             </div>
-            <div>
-              <span>({new Date(post.date).getFullYear()})</span>
-            </div>
+            {customYear && (
+              <div
+                className="font-light text-xl"
+                style={{ fontFamily: 'Unbounded Variable, sans-serif' }}
+              >
+                ({customYear})
+              </div>
+            )}
           </div>
         </main>
       </div>

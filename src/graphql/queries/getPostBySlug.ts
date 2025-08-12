@@ -143,6 +143,10 @@ export const GET_POST_BY_SLUG = gql`
             text1
             text2
           }
+          ... on TypesOfContentChooseYearLayout {
+            fieldGroupName
+            number
+          }
         }
       }
       categories {
