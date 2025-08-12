@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 import { CompaniesProps } from './types'
 
-const ROW_OFFSET = 400 // px, на сколько смещаем ряды изначально
+const ROW_OFFSET = 200 // px, на сколько смещаем ряды изначально
 
 export const Companies = ({ companies }: CompaniesProps) => {
   const [isMobile, setIsMobile] = useState(false)
@@ -27,8 +27,8 @@ export const Companies = ({ companies }: CompaniesProps) => {
     const handleScroll = () => {
       const rect = topRef.current?.parentElement?.getBoundingClientRect()
       if (!rect) return
-      const start = window.innerHeight / 2 // начинаем с середины экрана
-      const end = 0 // заканчиваем у верхнего края
+      const start = window.innerHeight // начинаем, когда блок появляется на экране
+      const end = window.innerHeight / 2 // заканчиваем в центре экрана
       const progress = Math.min(
         Math.max((start - rect.top) / (start - end), 0),
         1,
@@ -113,7 +113,7 @@ export const Companies = ({ companies }: CompaniesProps) => {
               ref={topRef}
               className="flex gap-6 items-center overflow-visible justify-end pl-[var(--container-padding,theme(spacing.4))]"
               style={{
-                transition: 'transform 0.2s linear',
+                transition: 'transform 0.5s linear',
                 transform: `translateX(${ROW_OFFSET}px)`,
               }}
             >
@@ -143,7 +143,7 @@ export const Companies = ({ companies }: CompaniesProps) => {
               ref={bottomRef}
               className="flex gap-6 items-center overflow-visible justify-start pr-[var(--container-padding,theme(spacing.4))]"
               style={{
-                transition: 'transform 0.2s linear',
+                transition: 'transform 0.5s linear',
                 transform: `translateX(-${ROW_OFFSET}px)`,
               }}
             >
