@@ -5,18 +5,23 @@ import ModalContactForm from '@/components/contactForm/ModalContactForm'
 import Modal from '@/components/modal/Modal'
 import type { ModalHandle } from '@/components/modal/modal.types'
 import { useRef, useState } from 'react'
+import SuccessModal from '../modal/SuccessModal'
 
 const Brief = ({ btnText = 'Обсудить проект', className = '' }) => {
   const modalRef = useRef<ModalHandle>(null)
-  const [modalMessage, setModalMessage] = useState<string | null>(null)
+  const successModalRef = useRef<ModalHandle>(null)
+  const [successMessage, setSuccessMessage] = useState('')
 
   const handleButtonClick = () => {
-    setModalMessage(null)
     modalRef.current?.showModal()
   }
 
   const handleSuccess = (message: string) => {
-    setModalMessage(message)
+    if (message !== 'Форма не отправлена') {
+      setSuccessMessage(message)
+      modalRef.current?.closeModal()
+      successModalRef.current?.showModal()
+    }
   }
 
   // Получаем descr для первого шага, если есть поле с layout 'row' и descr
@@ -30,24 +35,19 @@ const Brief = ({ btnText = 'Обсудить проект', className = '' }) =>
         {btnText}
       </button>
       <Modal ref={modalRef} fullScreen closeIcon contentClassName="cont">
-        {modalMessage ? (
-          <div className="py-8 text-center">
-            <p>{modalMessage}</p>
-          </div>
-        ) : (
-          <ModalContactForm
-            title="Обсуждение проекта"
-            fullScreen
-            fields={contactFormFields}
-            message="Ваше сообщение"
-            closeIcon
-            onSuccess={handleSuccess}
-            showStepCounter
-            inlineFirstStep
-            descr={firstStepDescr}
-          />
-        )}
+        <ModalContactForm
+          title="Обсуждение проекта"
+          fullScreen
+          fields={contactFormFields}
+          message="Ваше сообщение"
+          closeIcon
+          onSuccess={handleSuccess}
+          showStepCounter
+          inlineFirstStep
+          descr={firstStepDescr}
+        />
       </Modal>
+      <SuccessModal ref={successModalRef} message={successMessage} />
     </>
   )
 }

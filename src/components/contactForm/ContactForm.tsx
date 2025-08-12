@@ -141,20 +141,10 @@ const ContactForm = ({
       } else {
         setSubmitError(result.message || 'Не удалось отправить сообщение')
         setWasSubmitted(false)
-        if (useParentModal && onSuccess) {
-          onSuccess('Форма не отправлена')
-        } else {
-          modalRef.current?.showModal()
-        }
       }
     } catch (error) {
       setSubmitError('Произошла ошибка при отправке формы')
       setWasSubmitted(false)
-      if (useParentModal && onSuccess) {
-        onSuccess('Форма не отправлена')
-      } else {
-        modalRef.current?.showModal()
-      }
       console.error('Submit error:', error)
     } finally {
       setIsSubmitting(false)
@@ -336,6 +326,10 @@ const ContactForm = ({
                   </div>
                 )}
               </>
+            )}
+
+            {submitError && (
+              <p className="text-error mt-4 text-center">{submitError}</p>
             )}
 
             {!useParentModal && (

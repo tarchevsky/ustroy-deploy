@@ -11,4 +11,5 @@ export interface ModalProps {
 
 export interface ModalHandle {
   showModal: () => void
+  closeModal: () => void
 }

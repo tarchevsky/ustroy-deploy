@@ -4,13 +4,21 @@ import { ModalHandle, ModalProps } from '@/components/modal/modal.types'
 import { forwardRef, useImperativeHandle, useRef } from 'react'
 
 const Modal = forwardRef<ModalHandle, ModalProps>(
-  ({ message, children, closeIcon, fullScreen, contentClassName, onClose }, ref) => {
+  (
+    { message, children, closeIcon, fullScreen, contentClassName, onClose },
+    ref,
+  ) => {
     const modalRef = useRef<HTMLDialogElement>(null)
 
     useImperativeHandle(ref, () => ({
       showModal: () => {
         if (modalRef.current) {
           modalRef.current.showModal()
+        }
+      },
+      closeModal: () => {
+        if (modalRef.current) {
+          modalRef.current.close()
         }
       },
     }))
