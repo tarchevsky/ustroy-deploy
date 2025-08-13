@@ -53,7 +53,7 @@ export const Companies = ({ companies }: CompaniesProps) => {
   if (isMobile) {
     return (
       <FadeIn className="cont">
-        <section className="ind py-8 mt-8 overflow-x-hidden">
+        <section className="ind overflow-x-hidden">
           <h2 className="text-3xl font-bold mb-8 text-[#333] uppercase">
             Наши заказчики
           </h2>

@@ -1,6 +1,6 @@
 export const ind_xs = '0 0 25px 0'
 export const ind_sm = '0 0 50px 0'
-export const ind_md = '0 0 100px 0'
+export const ind_md = '0 0 120px 0'
 export const cont_xs = '16px'
 export const cont_sm = '40px'
 export const cont_md = '100px'
