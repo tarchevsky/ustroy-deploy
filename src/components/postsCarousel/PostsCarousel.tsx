@@ -173,7 +173,7 @@ const PostsCarousel: React.FC<PostsCarouselProps> = ({ posts }) => {
     : pageFilteredPosts
 
   return (
-    <div>
+    <div className="ind">
       {/* Карусель постов */}
       <div
         className="relative"

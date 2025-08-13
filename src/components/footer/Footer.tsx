@@ -24,7 +24,7 @@ const Footer = ({
   menuItems,
 }: FooterProps) => {
   return (
-    <footer className="footer cont ind">
+    <footer className="footer cont mb-[29px] md:mb-[43px]">
       <FadeIn className="w-full bg-white rounded-box p-10">
         {/* Верхний блок: мобильный flex, десктоп grid */}
         <div className="w-full flex flex-col gap-4 md:grid md:grid-cols-4 md:gap-0 md:justify-between md:items-start">
