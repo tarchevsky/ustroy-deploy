@@ -75,28 +75,6 @@ export default function ProjectPageClient({
         </span>
         <span className="text-primary font-semibold ml-1">Проекты</span>
       </nav>
-      {showHero && (
-        <div className="mb-8">
-          <div className="mb-4 cont">
-            <h1 className="text-3xl font-bold">{heroBlock.header}</h1>
-            {heroBlock.sub && (
-              <div className="text-lg text-gray-500">{heroBlock.sub}</div>
-            )}
-            {heroBlock.text1 && <div>{heroBlock.text1}</div>}
-            {heroBlock.text2 && <div>{heroBlock.text2}</div>}
-            {heroBlock.buttonText && (
-              <button className="btn btn-primary mt-4">
-                {heroBlock.buttonText}
-              </button>
-            )}
-          </div>
-        </div>
-      )}
-      {aboutBlock && (
-        <div className="mb-8">
-          <div>{aboutBlock.title}</div>
-        </div>
-      )}
 
       {/* Универсальный рендерер для условных блоков */}
       <ConditionalRenderer

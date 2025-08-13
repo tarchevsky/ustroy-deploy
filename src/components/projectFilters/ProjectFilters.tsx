@@ -53,7 +53,7 @@ const ProjectFilters: React.FC<ProjectFiltersProps> = ({
 
   return (
     <div
-      className={`ind cont carousel carousel-center gap-2 py-2 w-full ${className}`}
+      className={`cont carousel carousel-center gap-2 w-full pb-8 ${className}`}
     >
       <button
         className={`btn btn-md md:btn-lg btn-primary text-white font-medium text-lg md:text-xl px-4 whitespace-nowrap ${

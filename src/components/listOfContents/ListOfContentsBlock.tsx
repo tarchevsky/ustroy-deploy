@@ -26,28 +26,28 @@ const ListOfContentsBlock: React.FC<ListOfContentsBlockProps> = ({
       : posts
 
     return (
-      <section className="my-12">
+      <>
         <ProjectFilters
           posts={posts}
           selectedCategory={selectedCategory}
           onCategoryChange={setSelectedCategory}
-          className="mb-6"
         />
-        <div className="cont">
-          <h2 className="text-2xl font-bold mb-6">Все проекты</h2>
+        <div className="ind cont">
+          <h2 className="text-5xl font-bold mb-6">Все проекты</h2>
           <ProjectGrid posts={filteredPosts} />
         </div>
-      </section>
+      </>
     )
   }
 
   if (type === 'workshops') {
     return (
-      <section className="my-12">
-        <div className="cont">
+      <>
+        <div className="ind cont">
+          <h2 className="text-5xl font-bold mb-6">Цеха</h2>
           <WorkshopPagesGrid pages={pages} />
         </div>
-      </section>
+      </>
     )
   }
 

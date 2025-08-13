@@ -10,12 +10,14 @@ import { transformCustomersFromPageSettings } from '@/services/transformService'
 import { Companies } from '@/ui/companies/Companies'
 import { wpToTailwind } from '@/utils/wpToTailwind'
 import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import AboutBlock from '../aboutBlock/AboutBlock'
 import ModalContactForm from '../contactForm/ModalContactForm'
 import Hero from '../hero/Hero'
 import ListOfContentsBlock from '../listOfContents/ListOfContentsBlock'
 import MiniGallery from '../miniGallery/MiniGallery'
+import Modal from '../modal/Modal'
+import type { ModalHandle } from '../modal/modal.types'
 import PostsCarousel from '../postsCarousel/PostsCarousel'
 import ProjectPicturesGrid from '../projects/ProjectPicturesGrid'
 import TextWithButton from '../textWithButton/TextWithButton'
@@ -192,9 +194,6 @@ const ConditionalCompaniesFromPageContent = ({
 }
 
 // Компонент для TextWithButton с формой
-import { useRef } from 'react'
-import Modal from '../modal/Modal'
-import type { ModalHandle } from '../modal/modal.types'
 
 const ConditionalTextWithButton = ({
   block,
