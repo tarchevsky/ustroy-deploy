@@ -58,10 +58,10 @@ const TextWithButton = ({
 
   if (!modalContent) {
     return (
-      <section className="ind mt-8">
+      <section className="ind">
         <div className="mr-[3vw] md:mr-[32vw]">
           <FadeIn className="ind cont-left bg-white rounded-r-box pl-2">
-            <div className="mt-16 flex flex-col md:flex-row items-center justify-between md:gap-4">
+            <div className="flex flex-col md:flex-row items-center justify-between md:gap-4">
               <p
                 className="text-2xl font-normal py-6 lg:py-0"
                 style={{ fontFamily: 'Unbounded Variable, sans-serif' }}

@@ -103,7 +103,7 @@ export const Companies = ({ companies }: CompaniesProps) => {
         marginRight: '-50vw',
       }}
     >
-      <section className="ind py-8 mt-8">
+      <section className="ind">
         <FadeIn className="cont">
           <h2 className="text-[32px] font-bold mb-8 text-[#333] uppercase">
             Наши заказчики
