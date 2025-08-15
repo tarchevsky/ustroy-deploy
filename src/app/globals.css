@@ -24,3 +24,9 @@ h1 {
 button {
   font-family: 'Unbounded Variable', sans-serif;
 }
+
+@media (max-width: 768px) {
+  .f-button {
+    display: none !important;
+  }
+}
