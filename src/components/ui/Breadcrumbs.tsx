@@ -11,7 +11,10 @@ interface BreadcrumbsProps {
 
 export function Breadcrumbs({ items }: BreadcrumbsProps) {
   return (
-    <nav className="cont text-sm text-gray-500 py-4" aria-label="breadcrumbs">
+    <nav
+      className="cont text-sm text-gray-500 py-6 md:pt-6 md:pb-10"
+      aria-label="breadcrumbs"
+    >
       {items.map((item, idx) =>
         item.href ? (
           <span key={item.name}>

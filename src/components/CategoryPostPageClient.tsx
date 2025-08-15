@@ -103,8 +103,20 @@ export default function CategoryPostPageClient({
       <div className="cont mb-8">
         <main>
           <div className="flex flex-col">
-            <div className="flex flex-col md:flex-row justify-between md:items-center mb-4">
-              <h1 className="text-3xl">{post.title}</h1>
+            <div className="flex flex-col gap-3 md:gap-2 md:flex-row justify-between md:items-start">
+              <div className="flex flex-col gap-2 md:max-w-2xl">
+                <h1 className="text-3xl md:text-[32px] leading-[44px]">
+                  {post.title}
+                </h1>
+                {customYear && (
+                  <div
+                    className="font-light text-xl"
+                    style={{ fontFamily: 'Unbounded Variable, sans-serif' }}
+                  >
+                    ({customYear})
+                  </div>
+                )}
+              </div>
               <Link
                 href={`${basePath}/${categorySlug}`}
                 className="btn btn-primary text-white border-2 hover:bg-white hover:text-primary text-xl font-normal btn-wide"
@@ -112,14 +124,6 @@ export default function CategoryPostPageClient({
                 {categoryName}
               </Link>
             </div>
-            {customYear && (
-              <div
-                className="font-light text-xl"
-                style={{ fontFamily: 'Unbounded Variable, sans-serif' }}
-              >
-                ({customYear})
-              </div>
-            )}
           </div>
         </main>
       </div>
