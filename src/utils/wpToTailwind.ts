@@ -50,7 +50,8 @@ const classMap: Record<string, string> = {
   'size-large': 'w-full',
 
   // Колонки
-  'wp-block-columns': 'flex flex-wrap md:flex-nowrap gap-6 mb-8',
+  'wp-block-columns':
+    'flex flex-wrap md:flex-nowrap gap-5 md:gap-6 md:mb-6 mb-8',
   'wp-block-column': 'w-full md:flex-1',
 
   // Списки и таблицы

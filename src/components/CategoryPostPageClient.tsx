@@ -100,7 +100,7 @@ export default function CategoryPostPageClient({
   return (
     <div>
       <Breadcrumbs items={breadcrumbs} />
-      <div className="cont mb-8">
+      <div className="cont mb-6">
         <main>
           <div className="flex flex-col">
             <div className="flex flex-col gap-3 md:gap-2 md:flex-row justify-between md:items-start">

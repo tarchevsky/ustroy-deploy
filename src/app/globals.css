@@ -25,6 +25,10 @@ button {
   font-family: 'Unbounded Variable', sans-serif;
 }
 
+.prose p {
+  @apply mb-0 mt-0;
+}
+
 @media (max-width: 768px) {
   .f-button {
     display: none !important;
