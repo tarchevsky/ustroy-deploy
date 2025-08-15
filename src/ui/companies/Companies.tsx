@@ -95,7 +95,7 @@ export const Companies = ({ companies }: CompaniesProps) => {
     <div
       style={{
         overflowX: 'hidden',
-        width: '100vw',
+        width: '99vw',
         position: 'relative',
         left: '50%',
         right: '50%',
