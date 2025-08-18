@@ -126,7 +126,7 @@ const FieldRender = ({
 
   return (
     <div className="form-control w-full">
-      {field.type !== 'checkbox' && field.type !== 'captcha' && (
+      {field.type !== 'checkbox' && field.type !== 'captcha' && field.type !== 'tel' && (
         <label className="label">
           <span className="label-text">{field.title}</span>
         </label>
