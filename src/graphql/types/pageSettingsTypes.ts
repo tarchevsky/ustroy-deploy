@@ -85,6 +85,7 @@ export interface TypesOfContentChooseCustomersLayout {
         sourceUrl: string
       }
     }
+    link?: string | null
   }>
 }
 

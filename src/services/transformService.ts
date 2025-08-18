@@ -105,6 +105,7 @@ export function transformCustomersFromPageSettings(
   repeater: Array<{
     fieldGroupName: string
     kartinka: { node: { altText: string; sourceUrl: string } }
+    link?: string | null
   }>,
 ) {
   if (!repeater) return []
@@ -114,5 +115,6 @@ export function transformCustomersFromPageSettings(
     alt: item.kartinka.node.altText || '',
     width: 141, // фиксированные размеры по макету
     height: 66, // фиксированные размеры по макету
+    link: item.link || null,
   }))
 }

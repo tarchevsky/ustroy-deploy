@@ -4,6 +4,7 @@ export interface Company {
   alt: string
   width: number
   height: number
+  link?: string | null
 }
 
 export interface CompaniesProps {

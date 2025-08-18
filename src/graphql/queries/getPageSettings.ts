@@ -90,6 +90,7 @@ export const GET_PAGE_SETTINGS = gql`
                   sourceUrl
                 }
               }
+              link
             }
           }
           ... on TypesOfContentChooseCalculateLayout {

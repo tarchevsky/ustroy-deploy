@@ -2,6 +2,7 @@
 
 import FadeIn from '@/components/fadeIn/FadeIn'
 import Image from 'next/image'
+import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { CompaniesProps } from './types'
 
@@ -59,27 +60,55 @@ export const Companies = ({ companies }: CompaniesProps) => {
           </h2>
 
           <div className="grid grid-cols-2 gap-4">
-            {companies.map((company) => (
-              <div
-                key={company.id}
-                className="bg-white rounded-box flex items-center justify-center"
-                style={{ height: 80 }}
-              >
-                <Image
-                  src={company.src}
-                  alt={company.alt}
-                  width={company.width || 100}
-                  height={company.height || 40}
-                  style={{
-                    maxWidth: '100%',
-                    maxHeight: '100%',
-                    objectFit: 'contain',
-                  }}
-                  onError={() => handleImageError(company.id)}
-                  unoptimized={imageErrors[company.id]}
-                />
-              </div>
-            ))}
+            {companies.map((company) => {
+              if (company.link) {
+                return (
+                  <Link
+                    key={company.id}
+                    href={company.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-white rounded-box flex items-center justify-center"
+                    style={{ height: 80 }}
+                  >
+                    <Image
+                      src={company.src}
+                      alt={company.alt}
+                      width={company.width || 100}
+                      height={company.height || 40}
+                      style={{
+                        maxWidth: '100%',
+                        maxHeight: '100%',
+                        objectFit: 'contain',
+                      }}
+                      onError={() => handleImageError(company.id)}
+                      unoptimized={imageErrors[company.id]}
+                    />
+                  </Link>
+                )
+              }
+              return (
+                <div
+                  key={company.id}
+                  className="bg-white rounded-box flex items-center justify-center"
+                  style={{ height: 80 }}
+                >
+                  <Image
+                    src={company.src}
+                    alt={company.alt}
+                    width={company.width || 100}
+                    height={company.height || 40}
+                    style={{
+                      maxWidth: '100%',
+                      maxHeight: '100%',
+                      objectFit: 'contain',
+                    }}
+                    onError={() => handleImageError(company.id)}
+                    unoptimized={imageErrors[company.id]}
+                  />
+                </div>
+              )
+            })}
           </div>
         </section>
       </FadeIn>
@@ -117,27 +146,55 @@ export const Companies = ({ companies }: CompaniesProps) => {
                 transform: `translateX(${ROW_OFFSET}px)`,
               }}
             >
-              {topRow.map((company) => (
-                <div
-                  key={company.id}
-                  className="bg-white rounded-box flex items-center justify-center"
-                  style={{ width: 205, height: 129 }}
-                >
-                  <Image
-                    src={company.src}
-                    alt={company.alt}
-                    width={company.width || 141}
-                    height={company.height || 66}
-                    style={{
-                      maxWidth: '100%',
-                      maxHeight: '100%',
-                      objectFit: 'contain',
-                    }}
-                    onError={() => handleImageError(company.id)}
-                    unoptimized={imageErrors[company.id]}
-                  />
-                </div>
-              ))}
+              {topRow.map((company) => {
+                if (company.link) {
+                  return (
+                    <Link
+                      key={company.id}
+                      href={company.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-white rounded-box flex items-center justify-center"
+                      style={{ width: 205, height: 129 }}
+                    >
+                      <Image
+                        src={company.src}
+                        alt={company.alt}
+                        width={company.width || 141}
+                        height={company.height || 66}
+                        style={{
+                          maxWidth: '100%',
+                          maxHeight: '100%',
+                          objectFit: 'contain',
+                        }}
+                        onError={() => handleImageError(company.id)}
+                        unoptimized={imageErrors[company.id]}
+                      />
+                    </Link>
+                  )
+                }
+                return (
+                  <div
+                    key={company.id}
+                    className="bg-white rounded-box flex items-center justify-center"
+                    style={{ width: 205, height: 129 }}
+                  >
+                    <Image
+                      src={company.src}
+                      alt={company.alt}
+                      width={company.width || 141}
+                      height={company.height || 66}
+                      style={{
+                        maxWidth: '100%',
+                        maxHeight: '100%',
+                        objectFit: 'contain',
+                      }}
+                      onError={() => handleImageError(company.id)}
+                      unoptimized={imageErrors[company.id]}
+                    />
+                  </div>
+                )
+              })}
             </div>
             <div
               ref={bottomRef}
@@ -147,27 +204,55 @@ export const Companies = ({ companies }: CompaniesProps) => {
                 transform: `translateX(-${ROW_OFFSET}px)`,
               }}
             >
-              {bottomRow.map((company) => (
-                <div
-                  key={company.id}
-                  className="bg-white rounded-box flex items-center justify-center"
-                  style={{ width: 205, height: 129 }}
-                >
-                  <Image
-                    src={company.src}
-                    alt={company.alt}
-                    width={company.width || 141}
-                    height={company.height || 66}
-                    style={{
-                      maxWidth: '100%',
-                      maxHeight: '100%',
-                      objectFit: 'contain',
-                    }}
-                    onError={() => handleImageError(company.id)}
-                    unoptimized={imageErrors[company.id]}
-                  />
-                </div>
-              ))}
+              {bottomRow.map((company) => {
+                if (company.link) {
+                  return (
+                    <Link
+                      key={company.id}
+                      href={company.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-white rounded-box flex items-center justify-center"
+                      style={{ width: 205, height: 129 }}
+                    >
+                      <Image
+                        src={company.src}
+                        alt={company.alt}
+                        width={company.width || 141}
+                        height={company.height || 66}
+                        style={{
+                          maxWidth: '100%',
+                          maxHeight: '100%',
+                          objectFit: 'contain',
+                        }}
+                        onError={() => handleImageError(company.id)}
+                        unoptimized={imageErrors[company.id]}
+                      />
+                    </Link>
+                  )
+                }
+                return (
+                  <div
+                    key={company.id}
+                    className="bg-white rounded-box flex items-center justify-center"
+                    style={{ width: 205, height: 129 }}
+                  >
+                    <Image
+                      src={company.src}
+                      alt={company.alt}
+                      width={company.width || 141}
+                      height={company.height || 66}
+                      style={{
+                        maxWidth: '100%',
+                        maxHeight: '100%',
+                        objectFit: 'contain',
+                      }}
+                      onError={() => handleImageError(company.id)}
+                      unoptimized={imageErrors[company.id]}
+                    />
+                  </div>
+                )
+              })}
             </div>
           </div>
         </FadeIn>

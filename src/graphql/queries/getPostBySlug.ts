@@ -65,6 +65,7 @@ export const GET_POST_BY_SLUG = gql`
                   sourceUrl
                 }
               }
+              link
             }
           }
           ... on TypesOfContentChooseAboutLayout {
