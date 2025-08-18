@@ -16,11 +16,6 @@ const TelField: React.FC<TelFieldProps> = ({ field, control, errors }) => {
 
   return (
     <div className="form-control w-full">
-      {field.title && (
-        <label className="label" htmlFor={field.name}>
-          <span className="label-text">{field.title}</span>
-        </label>
-      )}
       <Controller
         name={field.name}
         control={control}
@@ -48,7 +43,6 @@ const TelField: React.FC<TelFieldProps> = ({ field, control, errors }) => {
             }}
             placeholder={field.placeholder}
             className="input input-bordered w-full"
-            autoComplete="tel"
           />
         )}
       />
