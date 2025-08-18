@@ -33,39 +33,24 @@ const TelField: React.FC<TelFieldProps> = ({ field, control, errors }) => {
             return phoneRegex.test(value) || 'Введите корректный номер телефона'
           },
         }}
-        render={({ field: { onChange, value } }) => {
-          const handlePhoneChange = (inputValue: string) => {
-            const formattedValue = formatPhoneNumber(inputValue)
-            onChange(formattedValue)
-            if (!formattedValue && field.name) {
-              removeItem(field.name)
-            }
-          }
-
-          return (
-            <input
-              type="tel"
-              id={field.name}
-              value={value || ''}
-              required={field.required}
-              onChange={(e) => handlePhoneChange(e.target.value)}
-              onInput={(e) => {
-                // Дополнительная обработка для автозаполнения на мобильных
-                const target = e.target as HTMLInputElement
-                handlePhoneChange(target.value)
-              }}
-              onPaste={(e) => {
-                // Обработка вставки номера из буфера обмена
-                e.preventDefault()
-                const paste = e.clipboardData?.getData('text') || ''
-                handlePhoneChange(paste)
-              }}
-              placeholder={field.placeholder}
-              className="input input-bordered w-full"
-              autoComplete="tel"
-            />
-          )
-        }}
+        render={({ field: { onChange, value } }) => (
+          <input
+            type="tel"
+            id={field.name}
+            value={value || ''}
+            required={field.required}
+            onChange={(e) => {
+              const formattedValue = formatPhoneNumber(e.target.value)
+              onChange(formattedValue)
+              if (!formattedValue && field.name) {
+                removeItem(field.name)
+              }
+            }}
+            placeholder={field.placeholder}
+            className="input input-bordered w-full"
+            autoComplete="tel"
+          />
+        )}
       />
       <ErrorMessage
         message={
